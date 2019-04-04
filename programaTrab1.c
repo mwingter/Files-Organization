@@ -8,6 +8,8 @@
  * nUSP: 10783243
  */
 
+#include <stdio.h>
+
 	//Struct do Registro de dados
 	typedef struct regdados_ REGDADOS;
 	struct regdados_{
@@ -34,15 +36,29 @@
 	typedef struct buffer_ BUFFER;
 	struct buffer_{
 		int nPaginas;
-		char paginas[x][32000]; //x a definir
+		char paginas[10][32000]; //x a definir
 	};
 
 
 
 
 int main(){
+	FILE *fp;
+	//FILE *fopen (char *nome_do_arquivo, char *modo_de_acesso);
+	fp = fopen ("SCC0215012019trabalho1-BCC-A.csv", "r");
 
+	/* TESTE PRA VER SE O ARQUIVO FOI ABERTO
+	if (fp == NULL) {
+       printf ("Houve um erro ao abrir o arquivo.\n");
+       return 1;
+    }
+    printf ("Arquivo SCC0215012019trabalho1-BCC-A criado com sucesso.\n");
+    fclose (fp);
+    return 0;
+	*/
 
+	FILE *arqBinario;
+	arqBinario = fopen ("", "wb");
 
 
 
