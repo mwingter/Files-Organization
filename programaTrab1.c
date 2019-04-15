@@ -44,7 +44,7 @@ struct regcab_{
 				  *	indicar que o arquivo de dados está consistente. Ao se abrir um arquivo para escrita, seu status 
 				  *	deve ser 0 e, ao finalizar o uso desse arquivo, seu status deve ser 1*/
 
-	int topoLista; //sempre igual à -1
+	double topoLista; //sempre igual à -1
 
 	char tags[6];  /*	*tagCampo1: valor resumido da tag idServidor. Deve assumir o valor i – tam: string de 1 byte.
 						*tagCampo2: " " " salarioServidor. Deve assumir o valor s – tam: string de 1 byte.
@@ -75,18 +75,22 @@ struct buffer_{
 };
 
 
+/*Criar função que escreve direto no disco!!!! Deletar essa struct de pagina de bosta, não precisa disso
+*/
+
 void salvaNaPagina(REGDADOS* r, REGCAB* c, BUFFER* b){
 	//verificar se o tamanho do registro não ultrapassa o tamanho restante da pagina
 	int tamRestantePagina = 32000 - b->paginas[b->nPaginas-1].nBytes;
-	printf("\n\t\ttam restante da pag antes= %d\n", tamRestantePagina);
-	printf("\t\t\ttam do registro + 5 = %d\n", r->tamanhoRegistro + 5);
-	printf("\tnPaginas antes= %d\n", b->nPaginas);
-	if(r->tamanhoRegistro + 5 > tamRestantePagina){
-		printf("tam registro > tam restante da pag");
+	int tamRegAtual = r->tamanhoRegistro + 5;
+//	printf("\n\t\ttam restante da pag antes= %d\n", tamRestantePagina);
+//	printf("\t\t\ttam do registro + 5 = %d\n", r->tamanhoRegistro + 5);
+//	printf("\tnPaginas antes= %d\n", b->nPaginas);
+	if(tamRegAtual > tamRestantePagina){
+		//printf("tam registro > tam restante da pag");
 		//preenche o resto dos bytes da pagina com '@'
 		//memset(&b->paginas->bytes[b->paginas->nBytes], '@', tamRestantePagina);
 		b->nPaginas++;
-		printf("\tnNova pagina. Paginas depois= %d", b->nPaginas);
+		//printf("\tnNova pagina. Paginas depois= %d", b->nPaginas);
 		b->paginas = realloc(b->paginas, (b->nPaginas)*sizeof(PAGINA));
 		b->paginas[b->nPaginas - 1].nBytes = 0;
 	}
@@ -151,17 +155,17 @@ bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
 		printf("%c",b->paginas[b->nPaginas - 1].bytes[i]);
 	}*/
 
-	printf("%s",b->paginas[0].bytes);
+	//printf("%s",b->paginas[0].bytes);
 
 
 	//memcpy(void *dest, const void *src, size_t n);
 
 	tamRestantePagina = 32000 - b->paginas[b->nPaginas-1].nBytes;
-	printf("\t\ttam restante da pag depois= %d\n\n", tamRestantePagina);
+//	printf("\t\ttam restante da pag depois= %d\n\n", tamRestantePagina);
 
 }
 
-void criaRegCabecalho(FILE* f, REGCAB* rc){
+void criaRegCabecalho(FILE* f, REGCAB* rc, BUFFER* b){
 	char ch = 'a';
 	int contaVirgula = 0;
 	int count = 0;
@@ -242,15 +246,80 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 
 	rc->topoLista = -1;
 
-	//status, topoLista, tag1, campo1, tag2, campo2,......., tag5, campo5
-	printf("|%c|%d|%c|%s|%c|%s|%c|%s|%c|%s|%c|%s|\n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3], rc->tags[4], rc->campos[4]);
+	//status(1), topoLista(8), tag1(1), campo1(40), tag2(1), campo2(40),......., tag5(1), campo5(40) => totalBytes= 10+5+200 = 215
+	//printf("|%c|%lf|%c|%s|%c|%s|%c|%s|%c|%s|%c|%s|\n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3], rc->tags[4], rc->campos[4]);
 
 	free(c1);free(c2);free(c3);free(c4);free(c5);
 
+	//adicionar registro de cabeçalho na primeira página de disco (nessa pagina deve conter apenas o cabeçalho)
+	b->nPaginas = 1;
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = rc->status;
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->status, 1);
+	
+	b->paginas[b->nPaginas - 1].nBytes += 8;
+	//sprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1],"%lf",rc->topoLista);
+	//snprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], 8, "%f", rc->topoLista);
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->topoLista, 8);
 
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = rc->tags[0];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->tags[0], 1);
+
+	b->paginas[b->nPaginas - 1].nBytes += 40;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = *rc->campos[0];
+	//memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->campos[0], 40);
+
+
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = rc->tags[1];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->tags[1], 1);
+
+	b->paginas[b->nPaginas - 1].nBytes += 40;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = *rc->campos[1];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->campos[1], 40);
+
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = rc->tags[2];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->tags[2], 1);
+
+	b->paginas[b->nPaginas - 1].nBytes += 40;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = *rc->campos[2];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->campos[2], 40);
+
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = rc->tags[3];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->tags[3], 1);
+
+	b->paginas[b->nPaginas - 1].nBytes += 40;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = *rc->campos[3];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->campos[3], 40);
+
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = rc->tags[4];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->tags[4], 1);
+
+	b->paginas[b->nPaginas - 1].nBytes += 40;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1] = *rc->campos[4];
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes - 1], &rc->campos[4], 40);
+
+	//printf("\nno vetor de struct: %s\n", rc->campos[0]);
+	//printf("\nno buffer: %s\n\n", b->paginas[b->nPaginas - 1].bytes);
+
+	int tamRegistroCab = b->paginas[b->nPaginas - 1].nBytes;
+	int restoPagina = 32000 - tamRegistroCab;
+
+	//printf("\tR.Cabeçalho - paginaDisco = %d,\t tamRegCab = %d,\t tamRestantePagina= %d \n\n", b->nPaginas, tamRegistroCab, restoPagina);
+
+/*
+	for(int i = 0; i < b->paginas[b->nPaginas - 1].nBytes; i++){
+		printf("%c",b->paginas[b->nPaginas - 1].bytes[i]);
+	}
+*/
+	
 }
 
-void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b){
+void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b, FILE* bin){
 	char ch = 'a';
 	int contaVirgula = 0;
 	int count = 0;
@@ -345,13 +414,33 @@ bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
 
 	
 
-
-	printf("|%c|%d|%f|%d|%lf|%s|%d|%c|%s|%d|%c|%s|\n\n", r->removido, r->tamanhoRegistro, r->encadeamentoLista, r->idServidor, 
-		r->salarioServidor, r->telefoneServidor, r->tamNomeServidor, c->tags[3], r->nomeServidor, r->tamCargoServidor, c->tags[4], r->cargoServidor);
+	//removido, tamRegistro, encadeamentoLista, idServidor, salarioServidor, telServidor, tamNome, tag3, nome, tamCargo, tag4, cargo
+	//printf("|%c|%d|%f|%d|%lf|%s|%d|%c|%s|%d|%c|%s|\n\n", r->removido, r->tamanhoRegistro, r->encadeamentoLista, r->idServidor, 
+	//	r->salarioServidor, r->telefoneServidor, r->tamNomeServidor, c->tags[3], r->nomeServidor, r->tamCargoServidor, c->tags[4], r->cargoServidor);
 
 	salvaNaPagina(r, c, b);
 	free(id); free(sal);
 }
+
+	/* FUNCIONALIDADES
+[1] Permita a leitura de vários registros obtidos a partir de um arquivo de entrada
+(arquivo no formato CSV) e a gravação desses registros em um arquivo de dados de
+saída. Esse arquivo de dados é binário e deve ter, obrigatoriamente, o nome
+arquivoTrab1.bin. O arquivo de entrada é fornecido juntamente com a especificação
+do projeto, enquanto que o arquivo de dados de saída deve ser gerado como parte deste
+trabalho prático.
+[2] Permita a recuperação dos dados, de todos os registros, armazenados no arquivo de
+dados, mostrando os dados de forma organizada na saída padrão para permitir a
+distinção dos campos e registros. O tratamento de ‘lixo’ deve ser feito de forma a
+permitir a exibição apropriada dos dados. Depois de mostrar todos os registros, deve
+ser mostrado na saída padrão o número de páginas de disco acessadas.
+[3] Permita a recuperação dos dados de todos os registros que satisfaçam um critério
+de busca determinado pelo usuário. Por exemplo, o usuário pode solicitar a exibição
+de todos os registros de um determinado número de identificação do servidor.
+Qualquer campo pode ser utilizado como forma de busca. Essa funcionalidade pode
+retornar 0 registros (quando nenhum satisfaz ao critério de busca), 1 registro ou vários
+registros.*/
+
 
 
 int main(){
@@ -405,7 +494,7 @@ anteriormente.
 
 	BUFFER *B;
 	B = calloc (1, sizeof(BUFFER));
-	B->nPaginas = 1;
+	B->nPaginas = 0;
 	B->paginas = calloc(1, sizeof(PAGINA));
 	B->paginas->nBytes = 0;
 
@@ -427,11 +516,15 @@ anteriormente.
 	//fread(&conteudo, sizeof(char), 100,pf); /* Le em conteudo o valor da variável armazenada anteriormente pf */
 
 
-	criaRegCabecalho(fp, RC);
+	criaRegCabecalho(fp, RC, B);
+	//return 0;
+	B->nPaginas = 2; //o cabeçalho deve ficar na primeira pagina sozinho, então ja incremento a pagina aqui
+	B->paginas = realloc(B->paginas, 2*sizeof(PAGINA));
+	B->paginas[1].nBytes = 0;
 	
 
 	FILE *arqBinario;
-	//arqBinario = fopen ("programaTrab1.bin", "wb");
+	arqBinario = fopen ("programaTrab1.bin", "wb");
 
 
 
@@ -444,7 +537,7 @@ anteriormente.
 	while ((c = fgetc(fp)) != EOF){
 		ungetc(c, fp);
 		RD = realloc(RD, (countReg+1)*sizeof(REGDADOS));
-		carregaRegistros(fp, &RD[countReg], RC, B);
+		carregaRegistros(fp, &RD[countReg], RC, B, arqBinario);
 		countReg++;
 	}
 
@@ -459,8 +552,11 @@ anteriormente.
 	for(int i = 0; i < countReg; i++){
 		free(RD[i].cargoServidor);
 		free(RD[i].nomeServidor);
-
 	}
+	/*for(int i = 0; i < B->nPaginas; i++){
+		free(&B->paginas[i]);
+	}*/ 
+
 	free(RD); free(RC); free(B);
 	fclose(fp);
 	printf("\nListar na saída padrão o arquivo binário gerado.\n");
