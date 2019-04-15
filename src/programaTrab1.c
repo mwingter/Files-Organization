@@ -21,11 +21,11 @@ struct regdados_{
 	double salarioServidor; //8 bytes
 	char telefoneServidor[14]; //14 bytes, no formato (DD)NNNNN-NNNN
 	//Campos de tam variavel:
-	int tamNomeServidor; //4 bytes
+	int tamNomeServidor; //tam variavel
 	char *nomeServidor; //tam variavel
 	
-	int tamCargoServidor; //4 bytes
-	char *cargoServidor; //tam variavel
+	int tamCargoServidor;
+	char *cargoServidor;
 	
 	char removido;	/*removido: indica se o registro se encontra removido ou não. Pode assumir os valores ‘*’, 
 					para indicar que o registro é um registro removido, ou ‘-’, para indicar que o registro não 
@@ -61,95 +61,12 @@ struct regcab_{
 						*/
 };
 
-typedef struct pagina_ PAGINA;
-struct pagina_ {
-	char bytes[32000];
-	int nBytes;
-};
-
 //Struct do Buffer-Pool
 typedef struct buffer_ BUFFER;
 struct buffer_{
 	int nPaginas;
-	PAGINA* paginas;
+	char paginas[][32000]; //x a definir
 };
-
-
-void salvaNaPagina(REGDADOS* r, REGCAB* c, BUFFER* b){
-	//verificar se o tamanho do registro não ultrapassa o tamanho restante da pagina
-	int tamRestantePagina = 32000 - b->paginas[b->nPaginas-1].nBytes;
-	printf("\n\t\ttam restante da pag antes= %d\n", tamRestantePagina);
-	printf("\t\t\ttam do registro + 5 = %d\n", r->tamanhoRegistro + 5);
-	printf("\tnPaginas antes= %d\n", b->nPaginas);
-	if(r->tamanhoRegistro + 5 > tamRestantePagina){
-		printf("tam registro > tam restante da pag");
-		//preenche o resto dos bytes da pagina com '@'
-		//memset(&b->paginas->bytes[b->paginas->nBytes], '@', tamRestantePagina);
-		b->nPaginas++;
-		printf("\tnPaginas depois= %d", b->nPaginas);
-		b->paginas = realloc(b->paginas, (b->nPaginas)*sizeof(PAGINA));
-		b->paginas[b->nPaginas - 1].nBytes = 0;
-	}
-
-	/*O tamanho do registro inclui: encadeamentoLista (8 bytes) + idServidor (4 bytes) + salarioServidor
-(8 bytes) + telefoneServidor (14 bytes) + indicador de tamanho do campo (4
-bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
-'\0') + indicador de tamanho (4 bytes) + tagCampo5 (1 byte) + cargoServidor
-(tamanho variável, incluindo o '\0').*/
-
-	//r->removido(1), r->tamanhoRegistro(4), r->encadeamentoLista(8), r->idServidor(4), 
-	//r->salarioServidor(8), r->telefoneServidor(14), r->tamNomeServidor(4), c->tags[3](1), 
-	//r->nomeServidor(variavel), r->tamCargoServidor(4), c->tags[4](1), r->cargoServidor(variavel)
-	b->paginas[b->nPaginas - 1].nBytes += 1; //nao conta no tam do registro
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->removido;
-
-	b->paginas[b->nPaginas - 1].nBytes += 4; //nao conta no tam do registro
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamanhoRegistro;
-
-	b->paginas[b->nPaginas - 1].nBytes += 8;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->encadeamentoLista;
-
-	b->paginas[b->nPaginas - 1].nBytes += 4;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->idServidor;
-
-	b->paginas[b->nPaginas - 1].nBytes += 8;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->salarioServidor;
-
-	b->paginas[b->nPaginas - 1].nBytes += 14;
-	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->telefoneServidor;
-	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->telefoneServidor, 14);
-
-	b->paginas[b->nPaginas - 1].nBytes += 4;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamNomeServidor;
-
-	b->paginas[b->nPaginas - 1].nBytes += 1;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = c->tags[3];
-
-	b->paginas[b->nPaginas - 1].nBytes += r->tamNomeServidor;
-	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->nomeServidor;
-	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->nomeServidor, r->tamNomeServidor);
-
-	b->paginas[b->nPaginas - 1].nBytes += 4;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamCargoServidor;
-
-	b->paginas[b->nPaginas - 1].nBytes += 1;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = c->tags[4];
-
-	b->paginas[b->nPaginas - 1].nBytes += r->tamCargoServidor;
-	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->cargoServidor;
-	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->cargoServidor, r->tamCargoServidor);
-
-	/*for(int i = 0; i < b->paginas[b->nPaginas - 1].nBytes; i++){
-		printf("%c",b->paginas[b->nPaginas - 1].bytes[i]);
-	}*/
-
-
-	//memcpy(void *dest, const void *src, size_t n);
-
-	tamRestantePagina = 32000 - b->paginas[b->nPaginas-1].nBytes;
-	printf("\t\ttam restante da pag depois= %d\n\n", tamRestantePagina);
-
-}
 
 void criaRegCabecalho(FILE* f, REGCAB* rc){
 	char ch = 'a';
@@ -240,7 +157,7 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 
 }
 
-void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b){
+void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c){
 	char ch = 'a';
 	int contaVirgula = 0;
 	int count = 0;
@@ -284,7 +201,6 @@ void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b){
 			}
 			else if(contaVirgula == 2){//telefone
 				r->telefoneServidor[count] = ch;
-				r->telefoneServidor[count+1] = '\0';
 				//printf("Printando telefone.... tel= %s, count = %d\n", r->telefoneServidor, count);
 				count++;
 			}
@@ -333,13 +249,11 @@ bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
 (tamanho variável, incluindo o '\0').*/
 	r->tamanhoRegistro = 8 + 4 + 8 + 14 + 4 + 1 + r->tamNomeServidor + 4 + 1 + r->tamCargoServidor;
 
-	
 
 
-	printf("|%c|%d|%f|%d|%lf|%s|%d|%c|%s|%d|%c|%s|\n\n", r->removido, r->tamanhoRegistro, r->encadeamentoLista, r->idServidor, 
+	printf("|%c|%d|%f|%d|%lf|%.14s|%d|%c|%s|%d|%c|%s|\n\n", r->removido, r->tamanhoRegistro, r->encadeamentoLista, r->idServidor, 
 		r->salarioServidor, r->telefoneServidor, r->tamNomeServidor, c->tags[3], r->nomeServidor, r->tamCargoServidor, c->tags[4], r->cargoServidor);
 
-	salvaNaPagina(r, c, b);
 	free(id); free(sal);
 }
 
@@ -379,7 +293,21 @@ anteriormente.
 	/*********CRIANDO REGISTRO DE CABEÇALHO********/
 	REGCAB *RC;
 	RC = calloc (1, sizeof(REGCAB));
+	RC->status = 0;
+	RC->topoLista = -1;
 
+	//RC->campos[1][0] = "numero de identificacao do servidor\0";
+	//sprintf(RC->campos[1], "numero de identificacao do servidor");
+	//strcpy(RC->campos[1], "numero de identificacao do servidor")
+	//RC->campos[2][0] = "salario do servidor";
+	//sprintf(RC->campos[2], "salario do servidor");
+	//RC->campos[3][0] = "telefone celular do servidor";
+	//sprintf(RC->campos[3], "telefone celular do servidor");
+	//RC->campos[4][0] = "nome do servidor";
+	//sprintf(RC->campos[4], "nome do servidor");
+	//RC->campos[5][0] = "cargo do servidor";
+	//sprintf(RC->campos[5], "cargo do servidor");
+	/**********************************************/
 	
 	/*printf("Campo: %s\n", &(RC->campos[1][0]));
 	for (int i = 0; i < 40; ++i)
@@ -391,16 +319,25 @@ anteriormente.
 	/*********CRIANDO REGISTRO DE DADOS********/
 	REGDADOS* RD;
 	RD = calloc (1, sizeof(REGDADOS));
-
+	/*
+	RD->idServidor = 0;
+	RD->salarioServidor = 0;
+	RD->tamCargoServidor = 0;
+	RD->cargoServidor = malloc(sizeof(char));
+	RD->tamNomeServidor = 0;
+	RD->nomeServidor = malloc(sizeof(char));
+	RD->removido = '-';
+	RD->tamanhoRegistro = 0;
+	RD->encadeamentoLista = 0;
+	/**********************************************/
 
 	BUFFER *B;
-	B = calloc (1, sizeof(BUFFER));
-	B->nPaginas = 1;
-	B->paginas = calloc(1, sizeof(PAGINA));
-	B->paginas->nBytes = 0;
+	B = malloc (sizeof(BUFFER));
+	B->nPaginas = 0;
+	B->paginas[B->nPaginas][32000];
 
 
-	//char texto_str[32000];
+	char texto_str[32000];
 
 	//enquanto não for fim de arquivo o looping será executado e será impresso o texto
 	//while(fgets(texto_str, 20, fp) != NULL)
@@ -421,9 +358,7 @@ anteriormente.
 	
 
 	FILE *arqBinario;
-	//arqBinario = fopen ("programaTrab1.bin", "wb");
-
-
+	//arqBinario = fopen ("arqSaidaBinario", "wb");
 
 
 
@@ -434,12 +369,10 @@ anteriormente.
 	while ((c = fgetc(fp)) != EOF){
 		ungetc(c, fp);
 		RD = realloc(RD, (countReg+1)*sizeof(REGDADOS));
-		carregaRegistros(fp, &RD[countReg], RC, B);
+		carregaRegistros(fp, &RD[countReg], RC);
 		countReg++;
 	}
 
-
-	
 
 	//fprintf(arqBinario, "%s", oqprintar); //printa no arquivo
 
