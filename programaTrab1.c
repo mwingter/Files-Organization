@@ -15,16 +15,17 @@
 
 //Struct do Registro de dados
 typedef struct regdados_ REGDADOS; //organização híbrida de campos e registros									
-struct regdados_{			//Campos de tam fixo = 26 bytes:
+struct regdados_{			
+	//Campos de tam fixo = 26 bytes:
 	int idServidor; 		//4 bytes
 	double salarioServidor; //8 bytes
 	char telefoneServidor[14]; //14 bytes, no formato (DD)NNNNN-NNNN
-							//Campos de tam variavel:
-	int tamNomeServidor; //tam variavel
+	//Campos de tam variavel:
+	int tamNomeServidor; //4 bytes
 	char *nomeServidor; //tam variavel
 	
-	int tamCargoServidor;
-	char *cargoServidor;
+	int tamCargoServidor; //4 bytes
+	char *cargoServidor; //tam variavel
 	
 	char removido;	/*removido: indica se o registro se encontra removido ou não. Pode assumir os valores ‘*’, 
 					para indicar que o registro é um registro removido, ou ‘-’, para indicar que o registro não 
@@ -52,7 +53,7 @@ struct regcab_{
 						*tagCampo5: " " " cargoServidor. Deve assumir o valor c – tam: string de 1 byte.
 					*/
 					
-	char campos[6][40]; /*	*desCampo1: idServidor. Deve assumir o valor ‘numero de identificacao do servidor’ – tam: string de 40 bytes.
+	char campos[5][40]; /*	*desCampo1: idServidor. Deve assumir o valor ‘numero de identificacao do servidor’ – tam: string de 40 bytes.
 							*desCampo2: salarioServidor. Deve assumir o valor ‘salario do servidor’ – tam: string de 40 bytes.
 							*desCampo3: telefoneServidor. Deve assumir o valor ‘telefone celular do servidor’ – tam: string de 40 bytes.
 							*desCampo4: nomeServidor. Deve assumir o valor ‘nome do servidor’ – tam: string de 40 bytes.
@@ -60,56 +61,245 @@ struct regcab_{
 						*/
 };
 
+typedef struct pagina_ PAGINA;
+struct pagina_ {
+	char bytes[32000];
+	int nBytes;
+};
+
 //Struct do Buffer-Pool
 typedef struct buffer_ BUFFER;
 struct buffer_{
 	int nPaginas;
-	char paginas[][32000]; //x a definir
+	PAGINA* paginas;
 };
 
-void criaRegistros(FILE *f, REGDADOS* r){
-	char ch;
+
+void salvaNaPagina(REGDADOS* r, REGCAB* c, BUFFER* b){
+	//verificar se o tamanho do registro não ultrapassa o tamanho restante da pagina
+	int tamRestantePagina = 32000 - b->paginas[b->nPaginas-1].nBytes;
+	printf("\n\t\ttam restante da pag antes= %d\n", tamRestantePagina);
+	printf("\t\t\ttam do registro + 5 = %d\n", r->tamanhoRegistro + 5);
+	printf("\tnPaginas antes= %d", b->nPaginas);
+	if(r->tamanhoRegistro + 5 > tamRestantePagina){
+		printf("tam registro > tam restante da pag");
+		//preenche o resto dos bytes da pagina com '@'
+		memset(&b->paginas->bytes[b->paginas->nBytes], '@', tamRestantePagina);
+		b->nPaginas++;
+		printf("\tnPaginas depois= %d", b->nPaginas);
+		b->paginas = realloc(b->paginas, (b->nPaginas)*sizeof(PAGINA));
+		b->paginas[b->nPaginas - 1].nBytes = 0;
+	}
+
+	/*O tamanho do registro inclui: encadeamentoLista (8 bytes) + idServidor (4 bytes) + salarioServidor
+(8 bytes) + telefoneServidor (14 bytes) + indicador de tamanho do campo (4
+bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
+'\0') + indicador de tamanho (4 bytes) + tagCampo5 (1 byte) + cargoServidor
+(tamanho variável, incluindo o '\0').*/
+
+	//r->removido(1), r->tamanhoRegistro(4), r->encadeamentoLista(8), r->idServidor(4), 
+	//r->salarioServidor(8), r->telefoneServidor(14), r->tamNomeServidor(4), c->tags[3](1), 
+	//r->nomeServidor(variavel), r->tamCargoServidor(4), c->tags[4](1), r->cargoServidor(variavel)
+	b->paginas[b->nPaginas - 1].nBytes += 1; //nao conta no tam do registro
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->removido;
+
+	b->paginas[b->nPaginas - 1].nBytes += 4; //nao conta no tam do registro
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamanhoRegistro;
+
+	b->paginas[b->nPaginas - 1].nBytes += 8;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->encadeamentoLista;
+
+	b->paginas[b->nPaginas - 1].nBytes += 4;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->idServidor;
+
+	b->paginas[b->nPaginas - 1].nBytes += 8;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->salarioServidor;
+
+	b->paginas[b->nPaginas - 1].nBytes += 14;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->telefoneServidor;
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->telefoneServidor, 14);
+
+	b->paginas[b->nPaginas - 1].nBytes += 4;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamNomeServidor;
+
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = c->tags[3];
+
+	b->paginas[b->nPaginas - 1].nBytes += r->tamNomeServidor;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->nomeServidor;
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->nomeServidor, r->tamNomeServidor);
+
+	b->paginas[b->nPaginas - 1].nBytes += 4;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamCargoServidor;
+
+	b->paginas[b->nPaginas - 1].nBytes += 1;
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = c->tags[4];
+
+	b->paginas[b->nPaginas - 1].nBytes += r->tamCargoServidor;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->cargoServidor;
+	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->cargoServidor, r->tamCargoServidor);
+
+	/*for(int i = 0; i < b->paginas[b->nPaginas - 1].nBytes; i++){
+		printf("%c",b->paginas[b->nPaginas - 1].bytes[i]);
+	}*/
+
+
+	//memcpy(void *dest, const void *src, size_t n);
+
+	tamRestantePagina = 32000 - b->paginas[b->nPaginas-1].nBytes;
+	printf("\t\ttam restante da pag depois= %d\n\n", tamRestantePagina);
+
+}
+
+void criaRegCabecalho(FILE* f, REGCAB* rc){
+	char ch = 'a';
 	int contaVirgula = 0;
 	int count = 0;
-	//char* nome = malloc(sizeof(char));
+	char* c1 = malloc(sizeof(char));
+	char* c2 = malloc(sizeof(char));
+	char* c3 = malloc(sizeof(char));
+	char* c4 = malloc(sizeof(char));
+	char* c5 = malloc(sizeof(char));
+
+	while(contaVirgula < 5){
+		ch = fgetc(f);
+		if(ch == '\n'){
+			break;
+		}
+		if(ch != ','){
+			if(contaVirgula == 0){
+				c1 = realloc(c1, (count+2)*sizeof(char));
+				c1[count] = ch;
+				c1[count+1] = '\0';
+				count++;
+			}
+			else if(contaVirgula == 1){
+				c2 = realloc(c2, (count+2)*sizeof(char));
+				c2[count] = ch;
+				c2[count+1] = '\0';
+				count++;
+			}
+			else if(contaVirgula == 2){
+				c3 = realloc(c3, (count+2)*sizeof(char));
+				c3[count] = ch;
+				c3[count+1] = '\0';
+				count++;
+			}
+			else if(contaVirgula == 3){
+				c4 = realloc(c4, (count+2)*sizeof(char));
+				c4[count] = ch;
+				c4[count+1] = '\0';
+				count++;
+			}
+			else if(contaVirgula == 4){
+				c5 = realloc(c5, (count+2)*sizeof(char));
+				c5[count] = ch;
+				c5[count+1] = '\0';
+				count++;
+			}
+		}
+		else if(ch == ','){
+			contaVirgula++;
+			count = 0;
+		}
+	}
+
+	strcpy(rc->campos[0], c1);
+	strcpy(rc->campos[1], c2);
+	strcpy(rc->campos[2], c3);
+	strcpy(rc->campos[3], c4);
+	strcpy(rc->campos[4], c5);
+	//printf("c5 = %s, e no rc fica = %s\n", c5, rc->campos[4]);
+
+	//completando os vazios com '@'
+	for(int j = 0; j < 5; j++){
+		for(int i = strlen(rc->campos[j]) + 1; i < 40; i++){
+			rc->campos[j][i] = '@';
+		}
+	}
+
+	//printf("\tREG CABEÇALHO: \n");
+	//printf("\t%.40s\n\t%.40s\n\t%.40s\n\t%.40s\n\t%.40s\n\n", rc->campos[0], rc->campos[1], rc->campos[2], rc->campos[3], rc->campos[4]);
+	
+	rc->tags[0] = 'i';
+	rc->tags[1] = 's';
+	rc->tags[2] = 't';
+	rc->tags[3] = 'n';
+	rc->tags[4] = 'c';
+
+	rc->status = '0'; //Ao se abrir um arquivo para escrita, seu status deve ser 0 
+					//e, ao finalizar o uso desse arquivo, seu status deve ser 1
+
+	rc->topoLista = -1;
+
+	//status, topoLista, tag1, campo1, tag2, campo2,......., tag5, campo5
+	printf("|%c|%d|%c|%s|%c|%s|%c|%s|%c|%s|%c|%s|\n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3], rc->tags[4], rc->campos[4]);
+
+	free(c1);free(c2);free(c3);free(c4);free(c5);
+
+
+}
+
+void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b){
+	char ch = 'a';
+	int contaVirgula = 0;
+	int count = 0;
+
 	char* id = malloc(sizeof(char));
+	id[0] = '\0';
 	char* sal = malloc(sizeof(char));
-	char* tel = malloc(sizeof(char));
+	sal[0] = '\0';
+
+	r->cargoServidor = malloc(sizeof(char));
+	r->cargoServidor[0] = '\0';
+
+	r->nomeServidor = malloc(sizeof(char));
+	r->nomeServidor[0] = '\0';
+	r->telefoneServidor[0] = '\0';
 
 
 	//lendo o arquivo char a char
-	while(ch != '\n' && contaVirgula < 5){
+	while(contaVirgula < 5){
 		ch = fgetc(f);
 		//printf("ch = %c\n", ch);
+		if(ch == '\n'){
+			break;
+		}
+
 		if(ch != ','){
 		//campos de tam fixo: idServidor(4b), salarioServidor(8b), telefoneServidor(14b)	=> total(26b)
 			if(contaVirgula == 0){ //id
-				id = realloc(id, (count+1)*sizeof(char));
+				id = realloc(id, (count+2)*sizeof(char));
 				id[count] = ch;
+				id[count+1] = '\0';
 				//printf("Printando id....ch= %c, id= %s, count = %d\n", ch, id, count);
 				count++;
 			}	
-			if(contaVirgula == 1){//salario
-				sal = realloc(sal, (count+1)*sizeof(char));
+			else if(contaVirgula == 1){//salario
+				sal = realloc(sal, (count+2)*sizeof(char));
 				sal[count] = ch;
+				sal[count+1] = '\0';
 				//printf("Printando salario.... sal= %s, count = %d\n", sal, count);
 				count++;
 			}
-			if(contaVirgula == 2){//telefone
+			else if(contaVirgula == 2){//telefone
 				r->telefoneServidor[count] = ch;
+				r->telefoneServidor[count+1] = '\0';
 				//printf("Printando telefone.... tel= %s, count = %d\n", r->telefoneServidor, count);
 				count++;
 			}
 			
 		//campos de tam variavel
-			if(contaVirgula == 3){//nome
-				r->nomeServidor = realloc(r->nomeServidor, (count+1)*sizeof(char));
+			else if(contaVirgula == 3){//nome
+				r->nomeServidor = realloc(r->nomeServidor, (count+2)*sizeof(char));
 				r->nomeServidor[count] = ch;
+				r->nomeServidor[count+1] = '\0';
 				count++;
 			}	
-			if(contaVirgula == 4){ //cargo
-				r->cargoServidor = realloc(r->cargoServidor, (count+1)*sizeof(char));
+			else if(contaVirgula == 4){ //cargo
+				r->cargoServidor = realloc(r->cargoServidor, (count+2)*sizeof(char));
 				r->cargoServidor[count] = ch;
+				r->cargoServidor[count+1] = '\0';
 				count++;
 			}
 
@@ -128,20 +318,29 @@ void criaRegistros(FILE *f, REGDADOS* r){
 	}
 	
 	r->idServidor = atoi(id);
-	r->salarioServidor = atoi(sal);
+	r->salarioServidor = atof(sal);
 	//r->nomeServidor = realloc(r->nomeServidor, r->tamNomeServidor);
 	//strcpy(r->nomeServidor, nome);
 	r->tamNomeServidor = strlen(r->nomeServidor);
 	r->tamCargoServidor = strlen(r->cargoServidor);
 	
 	r->removido = '-';
-	r->tamanhoRegistro = 26 + r->tamNomeServidor + r->tamCargoServidor;
-	r->encadeamentoLista = 0;
+	r->encadeamentoLista = -1;
+	/*O tamanho do registro inclui: encadeamentoLista (8 bytes) + idServidor (4 bytes) + salarioServidor
+(8 bytes) + telefoneServidor (14 bytes) + indicador de tamanho do campo (4
+bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
+'\0') + indicador de tamanho (4 bytes) + tagCampo5 (1 byte) + cargoServidor
+(tamanho variável, incluindo o '\0').*/
+	r->tamanhoRegistro = 8 + 4 + 8 + 14 + 4 + 1 + r->tamNomeServidor + 4 + 1 + r->tamCargoServidor;
 
-	printf("id = %d\nsalario = %lf\ntel = %s\nnome = %s\ncargo = %s\n", r->idServidor, r->salarioServidor, r->telefoneServidor, r->nomeServidor, r->cargoServidor);
+	
 
-	free(id); free(sal); free(tel);
-			
+
+	printf("|%c|%d|%f|%d|%lf|%s|%d|%c|%s|%d|%c|%s|\n\n", r->removido, r->tamanhoRegistro, r->encadeamentoLista, r->idServidor, 
+		r->salarioServidor, r->telefoneServidor, r->tamNomeServidor, c->tags[3], r->nomeServidor, r->tamCargoServidor, c->tags[4], r->cargoServidor);
+
+	salvaNaPagina(r, c, b);
+	free(id); free(sal);
 }
 
 
@@ -165,7 +364,8 @@ anteriormente.
 
 	FILE *fp;
 	//FILE *fopen (char *nome_do_arquivo, char *modo_de_acesso);
-	fp = fopen ("SCC0215012019trabalho1-BCC-A.csv", "r");
+
+	fp = fopen ("SCC0215012019trabalho1BCC.csv", "r");
 
 	/* TESTE PRA VER SE O ARQUIVO FOI ABERTO
 	if (fp == NULL) {
@@ -177,28 +377,9 @@ anteriormente.
 	*/
 
 	/*********CRIANDO REGISTRO DE CABEÇALHO********/
-	REGCAB* RC;
-	RC = malloc (sizeof(REGCAB));
-	RC->status = 0;
-	RC->topoLista = -1;
-	RC->tags[1] = 'i';
-	RC->tags[2] = 's';
-	RC->tags[3] = 't';
-	RC->tags[4] = 'n';
-	RC->tags[5] = 'c';
-	//RC->tags[5] = {'', 'i', 's', 't', 'n', 'c'}
-	//RC->campos[1][0] = "numero de identificacao do servidor\0";
-	sprintf(RC->campos[1], "numero de identificacao do servidor");
-	//strcpy(RC->campos[1], "numero de identificacao do servidor")
-	//RC->campos[2][0] = "salario do servidor";
-	sprintf(RC->campos[2], "salario do servidor");
-	//RC->campos[3][0] = "telefone celular do servidor";
-	sprintf(RC->campos[3], "telefone celular do servidor");
-	//RC->campos[4][0] = "nome do servidor";
-	sprintf(RC->campos[4], "nome do servidor");
-	//RC->campos[5][0] = "cargo do servidor";
-	sprintf(RC->campos[5], "cargo do servidor");
-	/**********************************************/
+	REGCAB *RC;
+	RC = calloc (1, sizeof(REGCAB));
+
 	
 	/*printf("Campo: %s\n", &(RC->campos[1][0]));
 	for (int i = 0; i < 40; ++i)
@@ -210,32 +391,23 @@ anteriormente.
 	/*********CRIANDO REGISTRO DE DADOS********/
 	REGDADOS* RD;
 	RD = calloc (1, sizeof(REGDADOS));
-	/*
-	RD->idServidor = 0;
-	RD->salarioServidor = 0;
-	RD->tamCargoServidor = 0;
-	RD->cargoServidor = malloc(sizeof(char));
-	RD->tamNomeServidor = 0;
-	RD->nomeServidor = malloc(sizeof(char));
-	RD->removido = '-';
-	RD->tamanhoRegistro = 0;
-	RD->encadeamentoLista = 0;
-	/**********************************************/
+
 
 	BUFFER *B;
-	B = malloc (sizeof(BUFFER));
-	B->nPaginas = 0;
-	B->paginas[B->nPaginas][32000];
+	B = calloc (1, sizeof(BUFFER));
+	B->nPaginas = 1;
+	B->paginas = calloc(1, sizeof(PAGINA));
+	B->paginas->nBytes = 0;
 
 
-	char texto_str[32000];
+	//char texto_str[32000];
 
 	//enquanto não for fim de arquivo o looping será executado e será impresso o texto
 	//while(fgets(texto_str, 20, fp) != NULL)
 	//	printf("%s", texto_str);
 
-	fgets(texto_str, 40, fp);
-	printf("%s\n", texto_str);
+	//fgets(texto_str, 40, fp);
+	//printf("%s\n", texto_str);
 	/*
 	fgets(texto_str, 100, fp);
 	printf("%s", texto_str);
@@ -245,30 +417,42 @@ anteriormente.
 	//fread(&conteudo, sizeof(char), 100,pf); /* Le em conteudo o valor da variável armazenada anteriormente pf */
 
 
-	 
+	criaRegCabecalho(fp, RC);
+	
 
 	FILE *arqBinario;
-	//arqBinario = fopen ("arqSaidaBinario", "wb");
+	//arqBinario = fopen ("programaTrab1.bin", "wb");
 
 
 
 
-	//criaRegistros(fp, RD);
+
+
+	//carregaRegistros(fp, RD, RC);
 	int countReg = 0;
-	while (fgetc(fp) != EOF){
+	char c;
+	while ((c = fgetc(fp)) != EOF){
+		ungetc(c, fp);
 		RD = realloc(RD, (countReg+1)*sizeof(REGDADOS));
-		criaRegistros(fp, &RD[countReg]);
+		carregaRegistros(fp, &RD[countReg], RC, B);
 		countReg++;
 	}
 
+
+	
 
 	//fprintf(arqBinario, "%s", oqprintar); //printa no arquivo
 
 
 
-	fclose(fp);
-	free(RD->cargoServidor); free(RD->nomeServidor);
+	
+	for(int i = 0; i < countReg; i++){
+		free(RD[i].cargoServidor);
+		free(RD[i].nomeServidor);
+
+	}
 	free(RD); free(RC); free(B);
+	fclose(fp);
 	printf("\nListar na saída padrão o arquivo binário gerado.\n");
 	return 0;
 }
