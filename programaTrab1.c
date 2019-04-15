@@ -86,7 +86,7 @@ void salvaNaPagina(REGDADOS* r, REGCAB* c, BUFFER* b){
 		//preenche o resto dos bytes da pagina com '@'
 		//memset(&b->paginas->bytes[b->paginas->nBytes], '@', tamRestantePagina);
 		b->nPaginas++;
-		printf("\tnPaginas depois= %d", b->nPaginas);
+		printf("\tnNova pagina. Paginas depois= %d", b->nPaginas);
 		b->paginas = realloc(b->paginas, (b->nPaginas)*sizeof(PAGINA));
 		b->paginas[b->nPaginas - 1].nBytes = 0;
 	}
@@ -102,46 +102,56 @@ bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
 	//r->nomeServidor(variavel), r->tamCargoServidor(4), c->tags[4](1), r->cargoServidor(variavel)
 	b->paginas[b->nPaginas - 1].nBytes += 1; //nao conta no tam do registro
 	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->removido;
+	//sprintf(b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes],"%d",r->removido);
 
 	b->paginas[b->nPaginas - 1].nBytes += 4; //nao conta no tam do registro
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamanhoRegistro;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamanhoRegistro;
+	sprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes],"%d",r->tamanhoRegistro);
 
 	b->paginas[b->nPaginas - 1].nBytes += 8;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->encadeamentoLista;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->encadeamentoLista;
+	//sprintf(b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes],"%d",r->encadeamentoLista);
+	snprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], 8, "%f", r->encadeamentoLista);
 
 	b->paginas[b->nPaginas - 1].nBytes += 4;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->idServidor;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->idServidor;
+	sprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes],"%d",r->idServidor);
 
 	b->paginas[b->nPaginas - 1].nBytes += 8;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->salarioServidor;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->salarioServidor;
+	snprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], 8, "%f", r->salarioServidor);
 
 	b->paginas[b->nPaginas - 1].nBytes += 14;
-	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->telefoneServidor;
-	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->telefoneServidor, 14);
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = *r->telefoneServidor;
+	//memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->telefoneServidor, 14);
 
 	b->paginas[b->nPaginas - 1].nBytes += 4;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamNomeServidor;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamNomeServidor;
+	sprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes],"%d",r->tamNomeServidor);
 
 	b->paginas[b->nPaginas - 1].nBytes += 1;
 	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = c->tags[3];
 
 	b->paginas[b->nPaginas - 1].nBytes += r->tamNomeServidor;
-	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->nomeServidor;
-	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->nomeServidor, r->tamNomeServidor);
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = *r->nomeServidor;
+	//memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->nomeServidor, r->tamNomeServidor);
 
 	b->paginas[b->nPaginas - 1].nBytes += 4;
-	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamCargoServidor;
+	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->tamCargoServidor;
+	sprintf(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes],"%d",r->tamCargoServidor);
 
 	b->paginas[b->nPaginas - 1].nBytes += 1;
 	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = c->tags[4];
 
 	b->paginas[b->nPaginas - 1].nBytes += r->tamCargoServidor;
-	//b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = r->cargoServidor;
-	memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->cargoServidor, r->tamCargoServidor);
+	b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes] = *r->cargoServidor;
+	//memcpy(&b->paginas[b->nPaginas - 1].bytes[b->paginas[b->nPaginas - 1].nBytes], &r->cargoServidor, r->tamCargoServidor);
 
-	/*for(int i = 0; i < b->paginas[b->nPaginas - 1].nBytes; i++){
+/*	for(int i = 0; i < b->paginas[b->nPaginas - 1].nBytes; i++){
 		printf("%c",b->paginas[b->nPaginas - 1].bytes[i]);
 	}*/
+
+	printf("%s",b->paginas[0].bytes);
 
 
 	//memcpy(void *dest, const void *src, size_t n);
