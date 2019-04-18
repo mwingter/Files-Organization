@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAX 1000
+#define MAX 100
 
 //Struct do Registro de dados
 typedef struct regdados_ REGDADOS; //organização híbrida de campos e registros									
@@ -22,10 +22,10 @@ struct regdados_{
 	char telefoneServidor[14]; //14 bytes, no formato (DD)NNNNN-NNNN
 	//Campos de tam variavel:
 	int tamNomeServidor; //4 bytes
-	char *nomeServidor; //tam variavel
+	char nomeServidor[MAX]; //tam variavel
 	
 	int tamCargoServidor; //4 bytes
-	char *cargoServidor; //tam variavel
+	char cargoServidor[MAX]; //tam variavel
 	
 	char removido;	/*removido: indica se o registro se encontra removido ou não. Pode assumir os valores ‘*’, 
 					para indicar que o registro é um registro removido, ou ‘-’, para indicar que o registro não 
@@ -165,7 +165,7 @@ bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
 
 }
 
-void criaRegCabecalho(FILE* f, REGCAB* rc, BUFFER* b){
+void criaRegCabecalho(FILE* f, REGCAB* rc, BUFFER* b, FILE* bin){
 	char ch = 'a';
 	int contaVirgula = 0;
 	int count = 0;
@@ -309,6 +309,29 @@ void criaRegCabecalho(FILE* f, REGCAB* rc, BUFFER* b){
 	int tamRegistroCab = b->paginas[b->nPaginas - 1].nBytes;
 	int restoPagina = 32000 - tamRegistroCab;
 
+	//*tamPagina += tamRegistroCab;
+
+	fwrite(&rc->status, sizeof(char), 1, bin);
+	fwrite(&rc->topoLista, sizeof(double), 1, bin);
+	fwrite(&rc->tags[0], sizeof(char), 1, bin);
+	fwrite(&rc->campos[0], 40*sizeof(char), 1, bin);
+	fwrite(&rc->tags[1], sizeof(char), 1, bin);
+	fwrite(&rc->campos[1], 40*sizeof(char), 1, bin);
+	fwrite(&rc->tags[2], sizeof(char), 1, bin);
+	fwrite(&rc->campos[2], 40*sizeof(char), 1, bin);
+	fwrite(&rc->tags[3], sizeof(char), 1, bin);
+	fwrite(&rc->campos[3], 40*sizeof(char), 1, bin);
+	fwrite(&rc->tags[4], sizeof(char), 1, bin);
+	fwrite(&rc->campos[4], 40*sizeof(char), 1, bin);
+
+
+	char arroba = '@';
+	for(int i = 0; i < restoPagina; i++){
+		fwrite(&arroba, sizeof(char), 1, bin);
+	}
+
+
+
 	//printf("\tR.Cabeçalho - paginaDisco = %d,\t tamRegCab = %d,\t tamRestantePagina= %d \n\n", b->nPaginas, tamRegistroCab, restoPagina);
 
 /*
@@ -316,9 +339,99 @@ void criaRegCabecalho(FILE* f, REGCAB* rc, BUFFER* b){
 		printf("%c",b->paginas[b->nPaginas - 1].bytes[i]);
 	}
 */
-	
 }
 
+void structToBin(int* tamPagina, REGDADOS* r, REGCAB* c, FILE* bin){
+	if((*tamPagina + r->tamanhoRegistro) > 32000){
+		*tamPagina = 0;
+		char arroba = '@';
+
+		for(int i = 0; i < r->tamanhoRegistro; i++){
+			fwrite(&arroba, sizeof(char), 1, bin);
+		}
+	}
+
+	tamPagina += r->tamanhoRegistro;
+
+	fwrite(&r->removido, sizeof(char), 1, bin);
+	fwrite(&r->tamanhoRegistro, sizeof(int), 1, bin);
+	fwrite(&r->encadeamentoLista, sizeof(double), 1, bin);
+	fwrite(&r->idServidor, sizeof(int), 1, bin);
+	fwrite(&r->salarioServidor, sizeof(double), 1, bin);
+	fwrite(&r->telefoneServidor, 14*sizeof(char), 1, bin);
+
+	if(r->nomeServidor != '\0'){
+		fwrite(&r->tamNomeServidor, sizeof(int), 1, bin);
+		fwrite(&c->tags[3], sizeof(char), 1, bin);
+		fwrite(&r->nomeServidor, r->tamNomeServidor, 1, bin);
+	}
+
+	if(r->cargoServidor != '\0'){
+		fwrite(&r->tamCargoServidor, sizeof(int), 1, bin);
+		fwrite(&c->tags[4], sizeof(char), 1, bin);
+		fwrite(&r->cargoServidor, r->tamCargoServidor, 1, bin);
+	}
+
+}
+
+//função melhor que salva os registros do arquivo pras structs
+void salvaRegistroNaStruct(FILE* f, REGDADOS* r){
+
+	fscanf(f, "%d", &r->idServidor); //salvando o id
+
+	fscanf(f, "%*c%lf", &r->salarioServidor); //pulando a virgula, e salvando o salario
+
+	fscanf(f, "%*c%[^,]", r->telefoneServidor); //lendo string até a virgula e salvando o telefone
+
+	fscanf(f, "%*c%[^,]", r->nomeServidor); //lendo string até a virgula e salvando o nome
+
+	fscanf(f, "%*c%[^\n\r]", r->cargoServidor); //lendo string até o \n e \r e salvando o cargo
+
+	//r->nomeServidor[strlen(r->nomeServidor)] = '\0';
+	//r->cargoServidor[strlen(r->cargoServidor)] = '\0';
+
+	if(r->idServidor == 0){
+		r->idServidor = -1;
+	}
+
+	if(r->salarioServidor == 0){
+		r->salarioServidor = -1;
+	}
+
+	if(r->telefoneServidor[0] != '('){
+		r->telefoneServidor[0] = '\0';
+		for(int i = 1; i < 14; i++){
+			r->telefoneServidor[i] = '@';
+		}
+	}
+
+	r->tamanhoRegistro = 8 + 4 + 8 + 14;
+
+	if(r->nomeServidor[0] != '\0'){
+		r->nomeServidor[strlen(r->nomeServidor)] = '\0';
+		r->tamNomeServidor = 1 + strlen(r->nomeServidor);
+		r->tamanhoRegistro += 4 + 1 + r->tamNomeServidor;
+	}
+
+	if(r->cargoServidor[0] != '\0'){
+		r->cargoServidor[strlen(r->cargoServidor)] = '\0';
+		r->tamNomeServidor = 1 + strlen(r->cargoServidor);
+		r->tamanhoRegistro += 4 + 1 + r->tamCargoServidor;
+	}
+
+
+	// sizeof(tag) = 1
+	//r->tamNomeServidor = 1 + strlen(r->nomeServidor);
+	//r->tamCargoServidor = 1 + strlen(r->cargoServidor);
+	
+	r->removido = '-';
+	r->encadeamentoLista = -1;
+
+//	r->tamanhoRegistro = 8 + 4 + 8 + 14 + 4 + 1 + r->tamNomeServidor + 4 + 1 + r->tamCargoServidor;
+
+}
+
+/*
 void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b, FILE* bin){
 	char ch = 'a';
 	int contaVirgula = 0;
@@ -405,11 +518,11 @@ void carregaRegistros(FILE *f, REGDADOS* r, REGCAB* c, BUFFER* b, FILE* bin){
 	
 	r->removido = '-';
 	r->encadeamentoLista = -1;
-	/*O tamanho do registro inclui: encadeamentoLista (8 bytes) + idServidor (4 bytes) + salarioServidor
-(8 bytes) + telefoneServidor (14 bytes) + indicador de tamanho do campo (4
-bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
-'\0') + indicador de tamanho (4 bytes) + tagCampo5 (1 byte) + cargoServidor
-(tamanho variável, incluindo o '\0').*/
+	//O tamanho do registro inclui: encadeamentoLista (8 bytes) + idServidor (4 bytes) + salarioServidor
+//(8 bytes) + telefoneServidor (14 bytes) + indicador de tamanho do campo (4
+//bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
+//'\0') + indicador de tamanho (4 bytes) + tagCampo5 (1 byte) + cargoServidor
+//(tamanho variável, incluindo o '\0').
 	r->tamanhoRegistro = 8 + 4 + 8 + 14 + 4 + 1 + r->tamNomeServidor + 4 + 1 + r->tamCargoServidor;
 
 	
@@ -420,7 +533,7 @@ bytes) + tagCampo4 (1 byte) + nomeServidor (tamanho variável, incluindo o
 
 	salvaNaPagina(r, c, b);
 	free(id); free(sal);
-}
+}*/
 
 	/* FUNCIONALIDADES
 [1] Permita a leitura de vários registros obtidos a partir de um arquivo de entrada
@@ -429,11 +542,13 @@ saída. Esse arquivo de dados é binário e deve ter, obrigatoriamente, o nome
 arquivoTrab1.bin. O arquivo de entrada é fornecido juntamente com a especificação
 do projeto, enquanto que o arquivo de dados de saída deve ser gerado como parte deste
 trabalho prático.
+
 [2] Permita a recuperação dos dados, de todos os registros, armazenados no arquivo de
 dados, mostrando os dados de forma organizada na saída padrão para permitir a
 distinção dos campos e registros. O tratamento de ‘lixo’ deve ser feito de forma a
 permitir a exibição apropriada dos dados. Depois de mostrar todos os registros, deve
 ser mostrado na saída padrão o número de páginas de disco acessadas.
+
 [3] Permita a recuperação dos dados de todos os registros que satisfaçam um critério
 de busca determinado pelo usuário. Por exemplo, o usuário pode solicitar a exibição
 de todos os registros de um determinado número de identificação do servidor.
@@ -464,16 +579,16 @@ anteriormente.
 	FILE *fp;
 	//FILE *fopen (char *nome_do_arquivo, char *modo_de_acesso);
 
-	fp = fopen ("SCC0215012019trabalho1BCC.csv", "r");
+	//fp = fopen ("SCC0215012019trabalho1BCC.csv", "r");
+	fp = fopen ("teste.csv", "r");
 
-	/* TESTE PRA VER SE O ARQUIVO FOI ABERTO
+	// TESTE PRA VER SE O ARQUIVO FOI ABERTO
 	if (fp == NULL) {
        printf ("Falha no carregamento do arquivo.");
        return 1;
     }
-    printf ("Arquivo SCC0215012019trabalho1-BCC-A criado com sucesso.\n");
-    fclose (fp);
-	*/
+    printf ("arquivoTrab1.bin.\n");
+	
 
 	/*********CRIANDO REGISTRO DE CABEÇALHO********/
 	REGCAB *RC;
@@ -516,7 +631,7 @@ anteriormente.
 	//fread(&conteudo, sizeof(char), 100,pf); /* Le em conteudo o valor da variável armazenada anteriormente pf */
 
 
-	criaRegCabecalho(fp, RC, B);
+	
 	//return 0;
 	B->nPaginas = 2; //o cabeçalho deve ficar na primeira pagina sozinho, então ja incremento a pagina aqui
 	B->paginas = realloc(B->paginas, 2*sizeof(PAGINA));
@@ -526,7 +641,8 @@ anteriormente.
 	FILE *arqBinario;
 	arqBinario = fopen ("programaTrab1.bin", "wb");
 
-
+	criaRegCabecalho(fp, RC, B, arqBinario);
+	//fseek de 32000 pra pular a primeira pagina (nela deve ter soh o reg de cabeçalho)
 
 
 
@@ -534,15 +650,40 @@ anteriormente.
 	//carregaRegistros(fp, RD, RC);
 	int countReg = 0;
 	char c;
+	/*
 	while ((c = fgetc(fp)) != EOF){
 		ungetc(c, fp);
 		RD = realloc(RD, (countReg+1)*sizeof(REGDADOS));
 		carregaRegistros(fp, &RD[countReg], RC, B, arqBinario);
 		countReg++;
 	}
+	*/
 
 
-	
+	int tamPag = 0;
+
+	/*
+	while(!feof(fp)){
+		RD = realloc(RD, (countReg+1)*sizeof(REGDADOS));
+		salvaRegistroNaStruct(fp, RD);
+		printf("|%c|%d|%f|%d|%lf|%s|%d|%c|%s|%d|%c|%s|\n\n", RD->removido, RD->tamanhoRegistro, RD->encadeamentoLista, RD->idServidor, 
+		RD->salarioServidor, RD->telefoneServidor, RD->tamNomeServidor, RC->tags[3], RD->nomeServidor, RD->tamCargoServidor, RC->tags[4], RD->cargoServidor);
+
+		structToBin(&tamPag, RD, RC, arqBinario);
+	}
+	*/
+
+	salvaRegistroNaStruct(fp, RD);
+	while(!feof(fp)){
+		printf("|%c|%d|%f|%d|%lf|%s|%d|%c|%s|%d|%c|%s|\n\n", RD->removido, RD->tamanhoRegistro, RD->encadeamentoLista, RD->idServidor, 
+		RD->salarioServidor, RD->telefoneServidor, RD->tamNomeServidor, RC->tags[3], RD->nomeServidor, RD->tamCargoServidor, RC->tags[4], RD->cargoServidor);
+		structToBin(&tamPag, RD, RC, arqBinario);
+		free(RD);
+		RD = calloc (1, sizeof(REGDADOS));
+		//RD = realloc(RD, (countReg+1)*sizeof(REGDADOS));
+		salvaRegistroNaStruct(fp, RD);
+
+	}
 
 	//fprintf(arqBinario, "%s", oqprintar); //printa no arquivo
 
