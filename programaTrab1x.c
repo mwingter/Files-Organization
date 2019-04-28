@@ -293,7 +293,7 @@ void lePrintaArqBin(char nome[MAX]){
 
 	char tag;
 	int tam;
-	long int total = 32000;
+//	long int total = 32000;
 	fseek(ptr, 32000, SEEK_CUR);
 
 	//while(!feof(ptr))
@@ -383,7 +383,6 @@ void lePrintaArqBin(char nome[MAX]){
 
 				}
 				else{
-					//printf("CORNO AQUI");
 					fseek(ptr, -5, SEEK_CUR); // VOLTA TAG
 					//t-> tamanhoRegistro += 5;
 
@@ -530,12 +529,13 @@ int main(int argc, char const *argv[]){
 
 
 	int op;
-	char nomeDoArquivo[MAX];
-	scanf("%d %[^\n\r]", nomeDoArquivo); //vale pras 3 funcionalidades
+	char nomeDoArquivo[MAX], valor[MAX], nomeDoCampo[MAX];
+	scanf("%d %[^\n\r]", &op, nomeDoArquivo); //vale pras 3 funcionalidades
+	FILE* fp;
 
 	switch(op){
 		case 1:
-			FILE *fp;
+			//FILE *fp;
 			fp = fopen (nomeDoArquivo, "r");	
 
 			if (!fp) {
@@ -599,26 +599,15 @@ int main(int argc, char const *argv[]){
 
 		case 3:
 			//printf("buscar coisas\n");
-		char nomeDoCampo[MAX];
-		char valor[MAX];
+			//char nomeDoCampo[MAX];
+			//char valor[MAX];
 			scanf("%[^\n\r] %[^\n\r]", nomeDoCampo, valor);
 			break;
 
 		default:
-			break;
-
+			printf("Opcao invalida.\n");
 
 	}
 
-
-	//fprintf(arqBinario, "%s", oqprintar); //printa no arquivo
-
-
-
-	
-
-
-
-	//printf("\nListar na saída padrão o arquivo binário gerado.\n");
 	return 0;
 }
