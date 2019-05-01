@@ -140,3 +140,25 @@ void atualizaStatus(REGCAB* rc, FILE* bin){
 	fseek(bin, 0, SEEK_SET);
 	fwrite(&rc->status, sizeof(char), 1, bin);
 }
+
+void leCabecalho(FILE* bin, int* n_pagina, REGCAB *rc) {
+	rc = calloc(1, sizeof(REGCAB));
+
+	fread(rc->status, STATUS_TAM, 1, bin);
+
+	if (rc->status == 0) {
+		printf("Falha no processamento do arquivo.\n");
+		return NULL;
+	}
+
+	//lendo o cabeçalho e salvando na struct
+	fread(&rc->topoLista, TOPO_TAM, 1, bin);
+	for (int i = 0; i < 5; i++) {
+		fread(rc->tags[i], TAG_TAM, 1, bin);
+		fread(rc->campos[i], CAMPO_TAM, 1, bin);
+	}
+
+	//avançando até a proxima página
+	fseek(bin, TAM_PAG_DISCO - CAB_TAM, SEEK_CUR);
+	*n_pagina = *n_pagina + 1;
+}

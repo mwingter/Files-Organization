@@ -4,6 +4,7 @@
 #define STATUS_TAM 	1
 #define TOPO_TAM 	8
 #define TAG_TAM 	1
+#define CAMPO_TAM	40
 
 
 // ***** STRUCT DO REGISTRO DE CABEÇALHO *****
@@ -16,14 +17,14 @@ struct regcab_{
 
 	long int topoLista; //sempre igual à -1
 
-	char tags[6];  /*	*tagCampo1: valor resumido da tag idServidor. Deve assumir o valor i – tam: string de 1 byte.
+	char tags[5];  /*	*tagCampo1: valor resumido da tag idServidor. Deve assumir o valor i – tam: string de 1 byte.
 						*tagCampo2: " " " salarioServidor. Deve assumir o valor s – tam: string de 1 byte.
 						*tagCampo3: " " " telefoneServidor. Deve assumir o valor t – tam: string de 1 byte.
 						*tagCampo4: " " " nomeServidor. Deve assumir o valor n – tam: string de 1 byte.
 						*tagCampo5: " " " cargoServidor. Deve assumir o valor c – tam: string de 1 byte.
 					*/
 					
-	char campos[5][40]; /*	*desCampo1: idServidor. Deve assumir o valor ‘numero de identificacao do servidor’ – tam: string de 40 bytes.
+	char campos[5][CAMPO_TAM]; /*	*desCampo1: idServidor. Deve assumir o valor ‘numero de identificacao do servidor’ – tam: string de 40 bytes.
 							*desCampo2: salarioServidor. Deve assumir o valor ‘salario do servidor’ – tam: string de 40 bytes.
 							*desCampo3: telefoneServidor. Deve assumir o valor ‘telefone celular do servidor’ – tam: string de 40 bytes.
 							*desCampo4: nomeServidor. Deve assumir o valor ‘nome do servidor’ – tam: string de 40 bytes.
@@ -34,3 +35,4 @@ struct regcab_{
 void criaRegCabecalho(FILE* f, REGCAB* rc);
 void regCabToArqBin(REGCAB* c, FILE* bin);
 void atualizaStatus(REGCAB* rc, FILE* bin);
+void leCabecalho(FILE* bin, int* n_pagina, REGCAB* rc)

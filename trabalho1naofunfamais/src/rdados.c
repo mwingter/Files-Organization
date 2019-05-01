@@ -279,8 +279,7 @@ void lePrintaArqBin(char nome[MAX]){
 
 }
 
-int tamArquivo(FILE *arq) 
-{
+int tamArquivo(FILE *arq) {
 	int tam;
 	fseek(arq, 0, SEEK_END);
 	tam = ftell(arq);
@@ -345,4 +344,192 @@ void salvaRegistroNaStruct(FILE* f, REGDADOS* r){
 
 //	r->tamanhoRegistro = 8 + 4 + 8 + 14 + 4 + 1 + r->tamNomeServidor + 4 + 1 + r->tamCargoServidor;
 
+}
+
+void buscaRegistro(FILE *bin, char nomeCampo[MAX], char valor[MAX], int tam_bin, REGCAB *rc, int pagAtual) {	
+	int numPaginasAcessadas = pagAtual;
+
+	if(nomeCampo == rc->campos[0]){
+		int id = atoi(valor);
+		busca_id(bin, tam_bin, id, numPaginasAcessadas, rc);
+	}
+	else if(nomeCampo == rc->campos[1]){
+		double sal = atof(valor);
+		busca_salario(bin, tam_bin, sal, numPaginasAcessadas, rc);
+	}
+	else if(nomeCampo == rc->campos[2]){
+		char tel[TEL_TAM];
+		strcpy(tel, valor);
+		busca_telefone(bin, tam_bin, tel, numPaginasAcessadas, rc);
+	}
+	else if(nomeCampo == rc->campos[3]){
+		char* nome;
+		nome = calloc(strlen(valor), sizeof(char));
+		strcpy(nome, valor);
+		busca_nome(bin, tam_bin, nome, numPaginasAcessadas, rc);
+
+	}
+	else if(nomeCampo == rc->campos[4]){
+		char* cargo;
+		cargo = calloc(strlen(valor), sizeof(char));
+		busca_cargo(bin, tam_bin, cargo, numPaginasAcessadas, rc);
+	}
+	
+	
+	printf("Número de páginas de disco acessadas: %d\n", numPaginasAcessadas);
+
+	free(h); free(nome); free(cargo);
+	fclose(bin);
+}
+
+void printaReg_Busca(REGCAB* rc, REGDADOS* rd) {
+	printf("%s: ", rc->campos[0]);
+	if (rd->idServidor != 1){
+		printf("%d\n", d->idServidor);
+	}
+	else{
+		printf("valor nao declarado\n");
+	}
+	
+	printf("%s: ", rc->campos[1]);
+	if (rd->salarioServidor != -1){
+		printf("%.2lf\n", d->salarioServidor);
+	}
+	else{
+		printf("valor nao declarado\n");
+	}
+	
+	printf("%s: ", rc->campos[2]);
+	if ((int) strlen(rd->telefoneServidor)){
+		printf("%s\n", d->telefoneServidor);
+	}
+	else{
+		printf("valor nao declarado\n");
+	}
+
+	printf("%s: ", rc->campos[3]);
+	if (rd->tamNomeServidor){
+		printf("%s\n", d->nomeServidor);
+	}
+	else{
+		printf("valor nao declarado\n");			
+	}
+
+	printf("%s: ", rc->campos[4]);
+	if (rd->tamCargoServidor){
+		printf("%s\n\n", d->cargoServidor);
+	}
+	else{
+		printf("valor nao declarado\n\n");
+	}
+}
+
+void leRegistroDoArqBin(FILE *bin, REGDADOS *rd){	
+	rd = calloc(1, sizeof(REGDADOS));
+
+	strcpy(rd->removido, "-");
+	rd->encadeamentoLista = -1;
+	rd->idServidor = -1;
+
+	rd->salarioServidor = -1;
+	strcpy(rd->telefoneServidor, "\0@@@@@@@@@");
+	rd->tamNomeServidor = 0;
+	rd->nomeServidor = NULL;
+	rd->tamCargoServidor = 0;
+	rd->cargoServidor = NULL;
+	rd->tamanhoRegistro = ID_TAM + SAL_TAM + TEL_TAM + ENC_TAM;
+
+	
+	fread(&rd->removido, TAM_REM, 1, bin);
+	
+	fread(&rd->tamanhoRegistro, TAM_TAM, 1, bin);
+
+	fread(&rd->encadeamentoLista, ENC_TAM, 1, bin);
+
+	fread(&rd->idServidor, ID_TAM, 1, bin);
+	
+	fread(&rd->salarioServidor, SAL_TAM, 1, bin);
+	
+	fread(&rd->telefoneServidor, TEL_TAM, 1, bin);
+
+	int tamReg = rd->tamanhoRegistro - ID_TAM - SAL_TAM - TEL_TAM - ENC_TAM ;
+	
+	int tam;
+	char tag;
+	fread(&size, TAM_TAM, 1, bin);
+	fread(&tag, TAG_TAM, 1, bin);
+	
+	if (tag == 'n') {
+		rd->tamNomeServidor = tam;
+		rd->nomeServidor = (char*) calloc(tam-1, tamof(char));
+		fread(rd->nomeServidor, tam-1, 1, bin);
+		tamReg -= TAM_TAM + tam;
+	} else if (tag == 'c') {
+		rd->tamCargoServidor = tam;
+		rd->cargoServidor = (char*) calloc(tam-1, tamof(char));
+		fread(rd->cargoServidor, tam-1, 1, bin);
+		tamReg -= TAM_TAM + tam;
+	} else {
+		fseek(bin, -(TAM_TAM + TAG_TAM), SEEK_CUR);
+	}
+
+	fread(&tam, TAM_TAM, 1, bin);
+	if (fread(&tag, TAG_TAM, 1, bin)) {
+		if (tag == 'c') {
+			rd->tamCargoServidor = tam;
+			rd->cargoServidor = (char*) calloc(tam-1, tamof(char));
+			fread(rd->cargoServidor, tam-1, 1, bin);
+			tamReg -= TAM_TAM + tam;
+		} else {
+			fseek(bin, -(TAM_TAM + TAG_TAM), SEEK_CUR);
+		}
+
+		if (tamReg > 0) {
+			char lixo;
+			while (tamReg) {
+				fread(lixo, sizeof(char), 1, bin);
+				tamReg--;
+			}
+		}
+	}
+}
+
+int busca_id(FILE *bin, int id, int numPaginasAcessadas, REGCAB *rc, int paginaAtual){
+	int regEncontrado = 0;
+	int tam_bin = tamArquivo(bin);
+
+	while (ftell(bin) != tam_bin) {
+
+		REGDADOS* rd;
+		leRegistroDoArqBin(bin, rd);
+		
+		if (id == rd->idServidor && strcmp(rd->removido, "-") == 0) {
+			regEncontrado = 1;
+			printaReg_Busca(rc, rd);
+			printf("Número de páginas de disco acessadas: %d\n", *numPaginasAcessadas);
+
+			return 1;
+		}
+
+		// get_page_info(d, found, paginaAtual, numPaginasAcessadas, tam_bin);
+		if(*paginaAtual - REM_TAM - TAM_TAM - rd->tamanhoRegistro == 0) {
+			*numPaginasAcessadas = *numPaginasAcessadas + 1;
+			*paginaAtual = NUM_PAG_DISCO;
+		} else 
+			*paginaAtual = *paginaAtual - REM_TAM - TAM_TAM - rd->tamanhoRegistro;
+
+		// if (ftell(bin) == tam_bin) {
+			
+		// 	if (regEncontrado == 0)
+		// 		printf("Registro inexistente.\n");
+			
+		// 	printf("\nNúmero de páginas de disco acessadas: %d\n", *numPaginasAcessadas);
+		// 	return;
+
+		// }
+		
+		free(rd);
+	}
+
+	return 0;
 }

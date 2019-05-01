@@ -61,7 +61,30 @@ void leBin_PrintBin(){
 }
 
 void buscaBin_Print(){
+	char nomeBin[MAX], nomeCampo[MAX], valor[MAX];
+	scanf(" %[^\n\r] %[^\n\r] %[^\r\n]", nomeBin, nomeCampo, valor);
 
+	FILE* bin = fopen(nomeBin, "r");
+
+	if(bin == NULL){
+		printf("Falha no processamento do arquivo.\n");
+		return;
+	}
+
+	
+
+	int paginaAtual = 0;
+	REGCAB* rc;
+	leCabecalho(bin, &paginaAtual, rc);
+	if (rc->status == '0') {
+		printf("Falha no processamento do arquivo.\n");
+		return;
+	}
+
+	//buscando registro e printando se encontrar
+	buscaRegistro(bin, nomeDoCampo, valor, rc, &paginaAtual);
+
+	free(h); fclose(bin);
 }
 
 void menu()
@@ -105,8 +128,7 @@ registros.*/
 
 }
 
-int main(int argc, char const *argv[])
-{
+int main(){
 
 	menu();
 	
