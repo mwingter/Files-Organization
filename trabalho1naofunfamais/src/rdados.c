@@ -385,39 +385,39 @@ void buscaRegistro(FILE *bin, char nomeCampo[MAX], char valor[MAX], int tam_bin,
 void printaReg_Busca(REGCAB* rc, REGDADOS* rd) {
 	printf("%s: ", rc->campos[0]);
 	if (rd->idServidor != 1){
-		printf("%d\n", d->idServidor);
+		printf("%d\n", rd->idServidor);
 	}
 	else{
 		printf("valor nao declarado\n");
 	}
 	
 	printf("%s: ", rc->campos[1]);
-	if (rd->salarioServidor != -1){
-		printf("%.2lf\n", d->salarioServidor);
+	if (rrd->salarioServidor != -1){
+		printf("%.2lf\n", rd->salarioServidor);
 	}
 	else{
 		printf("valor nao declarado\n");
 	}
 	
 	printf("%s: ", rc->campos[2]);
-	if ((int) strlen(rd->telefoneServidor)){
-		printf("%s\n", d->telefoneServidor);
+	if ((int) strlen(rrd->telefoneServidor)){
+		printf("%s\n", rd->telefoneServidor);
 	}
 	else{
 		printf("valor nao declarado\n");
 	}
 
 	printf("%s: ", rc->campos[3]);
-	if (rd->tamNomeServidor){
-		printf("%s\n", d->nomeServidor);
+	if (rrd->tamNomeServidor){
+		printf("%s\n", rd->nomeServidor);
 	}
 	else{
 		printf("valor nao declarado\n");			
 	}
 
 	printf("%s: ", rc->campos[4]);
-	if (rd->tamCargoServidor){
-		printf("%s\n\n", d->cargoServidor);
+	if (rrd->tamCargoServidor){
+		printf("%s\n\n", rd->cargoServidor);
 	}
 	else{
 		printf("valor nao declarado\n\n");
