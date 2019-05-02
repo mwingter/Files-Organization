@@ -358,13 +358,8 @@ void buscaRegBin(FILE* bin, REGCAB* rc, char nomeCampo[MAX], char valor[MAX]){
  				numPaginasAcessadas: ponteiro que guarda quantas páginas do arquivo acessei na busca
 */
 void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
-	//int tamPagina = 0;
 
-	//printf("Entrei na função q busca id\n");
-
-	//printf("CAMPOO: %s\n", rc->campos[0]);
-
-	while(!feof(bin)){
+	while(ftell(bin) != tam_bin){
 		
 		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
 		leUmRegistroBin(bin, rd, tam_pag);
@@ -384,11 +379,13 @@ void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *ta
 }
 
 void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
+	
 	while(ftell(bin) != tam_bin){
 		
 		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
 		leUmRegistroBin(bin, rd, tam_pag);
 		if(rd->salarioServidor == sal){
+			//printf("cargoooo = %s, tam = %d\n", rd->cargoServidor, rd->tamCargoServidor);
 			printaRegEncontrado(rc, rd);
 			(*achei) = 1;
 		}
@@ -496,9 +493,8 @@ void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tam_pag){
 	 //se o registro ainda tem mais dados, continuar
 	fread(&tam,TAM_TAM,1,bin); // lendo o tamanho da proxima string, q pode ser nome ou campo
 	//printf("tam = %d\n", tam);
-	fread(&tag,TAG_TAM,1,bin); // lendo a tag da proxima string, q pode ser nome ou campo
-	
-	//printf("tam = %d\n", tam);
+	fread(&tag,TAG_TAM,1,bin); // lendo a tag da proxima string, q pode ser nome ou campo	
+	//printf("tag = %c\n", tag);
 	
 	//verificando se o campo será de nome ou campo
 	if(tag == 'n' ){ //se for n é pq tem nome

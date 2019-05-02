@@ -102,31 +102,31 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 void regCabToArqBin(REGCAB* c, FILE* bin){
 
 	int tamRegistroCab = 214;//1+8+1+40+1+40+1+40+1+40+1+40
-	int restoPagina = 32000 - tamRegistroCab;
+	int restoPagina = TAM_PAG_DISCO - tamRegistroCab;
 
-	fwrite(&c->status, sizeof(char), 1, bin);
+	fwrite(&c->status, STATUS_TAM, 1, bin);
 
-	fwrite(&c->topoLista, sizeof(long int), 1, bin);
+	fwrite(&c->topoLista, TOPO_TAM, 1, bin);
 
-	fwrite(&c->tags[0], sizeof(char), 1, bin);
+	fwrite(&c->tags[0], TAG_TAM, 1, bin);
 
-	fwrite(&c->campos[0], 40*sizeof(char), 1, bin);
+	fwrite(&c->campos[0], CAMPO_TAM*sizeof(char), 1, bin);
 
-	fwrite(&c->tags[1], sizeof(char), 1, bin);
+	fwrite(&c->tags[1], TAG_TAM, 1, bin);
 
-	fwrite(&c->campos[1], 40*sizeof(char), 1, bin);
+	fwrite(&c->campos[1], CAMPO_TAM*sizeof(char), 1, bin);
 
-	fwrite(&c->tags[2], sizeof(char), 1, bin);
+	fwrite(&c->tags[2], TAG_TAM, 1, bin);
 
-	fwrite(&c->campos[2], 40*sizeof(char), 1, bin);
+	fwrite(&c->campos[2], CAMPO_TAM*sizeof(char), 1, bin);
 
-	fwrite(&c->tags[3], sizeof(char), 1, bin);
+	fwrite(&c->tags[3], TAG_TAM, 1, bin);
 
-	fwrite(&c->campos[3], 40*sizeof(char), 1, bin);
+	fwrite(&c->campos[3], CAMPO_TAM*sizeof(char), 1, bin);
 
-	fwrite(&c->tags[4], sizeof(char), 1, bin);
+	fwrite(&c->tags[4], TAG_TAM, 1, bin);
 
-	fwrite(&c->campos[4], 40*sizeof(char), 1, bin);
+	fwrite(&c->campos[4], CAMPO_TAM*sizeof(char), 1, bin);
 
 	
 	char arroba = '@';
@@ -138,7 +138,7 @@ void regCabToArqBin(REGCAB* c, FILE* bin){
 void atualizaStatus(REGCAB* rc, FILE* bin){
 	strcpy(&rc->status, "1");
 	fseek(bin, 0, SEEK_SET);
-	fwrite(&rc->status, sizeof(char), 1, bin);
+	fwrite(&rc->status, STATUS_TAM, 1, bin);
 }
 
 void leCabecalho(FILE* bin, REGCAB *rc) {

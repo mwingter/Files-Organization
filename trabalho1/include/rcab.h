@@ -19,14 +19,14 @@ struct regcab_{
 
 	long int topoLista; //sempre igual à -1
 
-	char tags[6];  /*	*tagCampo1: valor resumido da tag idServidor. Deve assumir o valor i – tam: string de 1 byte.
+	char tags[5];  /*	*tagCampo1: valor resumido da tag idServidor. Deve assumir o valor i – tam: string de 1 byte.
 						*tagCampo2: " " " salarioServidor. Deve assumir o valor s – tam: string de 1 byte.
 						*tagCampo3: " " " telefoneServidor. Deve assumir o valor t – tam: string de 1 byte.
 						*tagCampo4: " " " nomeServidor. Deve assumir o valor n – tam: string de 1 byte.
 						*tagCampo5: " " " cargoServidor. Deve assumir o valor c – tam: string de 1 byte.
 					*/
 					
-	char campos[5][40]; /*	*desCampo1: idServidor. Deve assumir o valor ‘numero de identificacao do servidor’ – tam: string de 40 bytes.
+	char campos[5][CAMPO_TAM]; /*	*desCampo1: idServidor. Deve assumir o valor ‘numero de identificacao do servidor’ – tam: string de 40 bytes.
 							*desCampo2: salarioServidor. Deve assumir o valor ‘salario do servidor’ – tam: string de 40 bytes.
 							*desCampo3: telefoneServidor. Deve assumir o valor ‘telefone celular do servidor’ – tam: string de 40 bytes.
 							*desCampo4: nomeServidor. Deve assumir o valor ‘nome do servidor’ – tam: string de 40 bytes.
