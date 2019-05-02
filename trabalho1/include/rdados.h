@@ -36,10 +36,10 @@ void structToBin(int* tamPagina, int *tamRegAnterior, REGDADOS* r, REGCAB* c, FI
 void lePrintaArqBin(char nome[MAX]);
 void salvaRegistroNaStruct(FILE* f, REGDADOS* r);
 void buscaRegBin(FILE* bin, REGCAB* rc, char nomeCampo[MAX], char valor[MAX]);
-void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc);
-void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc);
-void busca_telefone (FILE* bin, int tam_bin, char tel[TEL_TAM], int *numPaginasAcessadas, int *tam_pag, REGCAB* rc);
-void busca_nome (FILE* bin, int tam_bin, char* nome, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc);
-void busca_cargo (FILE* bin, int tam_bin, char* cargo, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc);
+void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
+void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
+void busca_telefone (FILE* bin, int tam_bin, char tel[TEL_TAM], int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
+void busca_nome (FILE* bin, int tam_bin, char* nome, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
+void busca_cargo (FILE* bin, int tam_bin, char* cargo, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
 void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tamanhoPagina);
 void printaRegEncontrado(REGCAB* rc, REGDADOS* rd);

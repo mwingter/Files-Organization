@@ -300,54 +300,51 @@ int tamArquivo(FILE *arq)
 */
 void buscaRegBin(FILE* bin, REGCAB* rc, char nomeCampo[MAX], char valor[MAX]){
 
-	//int tam = ftell(bin);
-	//printf("POS ANTES = %d \n", tam);
-	//rewind(bin);
-	//fseek(bin, 1, SEEK_CUR);
-
+	int achei = 0;
 	int tam_bin = tamArquivo(bin);
 	int tam_pag = 0;
-	//tam = ftell(bin);
-	//printf("POS DEPOIS = %d \n", tam);
 	fseek(bin, TAM_PAG_DISCO, SEEK_CUR);
 	int numPaginasAcessadas = 1; //ja acessei o Registro de cabeçalho na primeira pagina
 
-	//printf("qlauqer coisa|%s|\n", nomeCampo);
-	//char* ids = "idServidor";
 	if(strcmp(nomeCampo,"idServidor") == 0){
 		//printf("vou procurar o id");
 		int id = atoi(valor);
-		busca_id(bin, tam_bin, id, &numPaginasAcessadas, &tam_pag, rc);
+		busca_id(bin, tam_bin, id, &numPaginasAcessadas, &tam_pag, rc, &achei);
 	}
 	else if(strcmp(nomeCampo, "salarioServidor") == 0){
 		double sal = atof(valor);
-		busca_salario(bin, tam_bin, sal, &numPaginasAcessadas, &tam_pag, rc);
+		busca_salario(bin, tam_bin, sal, &numPaginasAcessadas, &tam_pag, rc, &achei);
 	}
 	else if(strcmp(nomeCampo, "telefoneServidor") == 0){
 		char tel[TEL_TAM];
 		strcpy(tel, valor);
-		busca_telefone(bin, tam_bin, tel, &numPaginasAcessadas, &tam_pag, rc);
+		busca_telefone(bin, tam_bin, tel, &numPaginasAcessadas, &tam_pag, rc, &achei);
 	}
 	else if(strcmp(nomeCampo,"nomeServidor") == 0){
 		char* nome;
-		nome = calloc(strlen(valor), sizeof(char));
+		nome = calloc(strlen(valor)+1, sizeof(char));
 		strcpy(nome, valor);
-		busca_nome(bin, tam_bin, nome, &numPaginasAcessadas, &tam_pag, rc);
+		busca_nome(bin, tam_bin, nome, &numPaginasAcessadas, &tam_pag, rc, &achei);
 		free(nome);
 
 	}
 	else if(strcmp(nomeCampo, "cargoServidor") == 0){
 		char* cargo;
-		cargo = calloc(strlen(valor), sizeof(char));
-		busca_cargo(bin, tam_bin, cargo, &numPaginasAcessadas, &tam_pag, rc);
+		cargo = calloc(strlen(valor)+1, sizeof(char));
+		strcpy(cargo, valor);
+		busca_cargo(bin, tam_bin, cargo, &numPaginasAcessadas, &tam_pag, rc, &achei);
 		free(cargo);
 	}
 	
 	if(tam_pag > 0 && tam_pag < 32000){
 		numPaginasAcessadas++;
 	}
-	
-	printf("Número de páginas de disco acessadas: %d\n", numPaginasAcessadas);
+	if(achei > 0){
+		printf("Número de páginas de disco acessadas: %d\n", numPaginasAcessadas);
+	}
+	else{
+		printf("Registro inexistente.\n");
+	}
 }
 
 /*
@@ -360,7 +357,7 @@ void buscaRegBin(FILE* bin, REGCAB* rc, char nomeCampo[MAX], char valor[MAX]){
  				id: Valor do id que quero buscar
  				numPaginasAcessadas: ponteiro que guarda quantas páginas do arquivo acessei na busca
 */
-void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc){
+void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
 	//int tamPagina = 0;
 
 	//printf("Entrei na função q busca id\n");
@@ -373,6 +370,7 @@ void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *ta
 		leUmRegistroBin(bin, rd, tam_pag);
 		if(rd->idServidor == id){
 			printaRegEncontrado(rc, rd);
+			(*achei) = 1;
 			return;
 		}
 
@@ -385,13 +383,14 @@ void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *ta
 	}
 }
 
-void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc){
-	while(!feof(bin)){
+void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
+	while(ftell(bin) != tam_bin){
 		
 		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
 		leUmRegistroBin(bin, rd, tam_pag);
 		if(rd->salarioServidor == sal){
 			printaRegEncontrado(rc, rd);
+			(*achei) = 1;
 		}
 
 		if((*tam_pag) == 32000){
@@ -403,13 +402,14 @@ void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas
 	}
 }
 
-void busca_telefone (FILE* bin, int tam_bin, char tel[TEL_TAM], int *numPaginasAcessadas, int *tam_pag, REGCAB* rc){
-	while(!feof(bin)){
+void busca_telefone (FILE* bin, int tam_bin, char tel[TEL_TAM], int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
+	while(ftell(bin) != tam_bin){
 		
 		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
 		leUmRegistroBin(bin, rd, tam_pag);
 		if(strcmp(rd->telefoneServidor, tel) == 0){
 			printaRegEncontrado(rc, rd);
+			(*achei) = 1;
 		}
 
 		if((*tam_pag) == 32000){
@@ -421,12 +421,43 @@ void busca_telefone (FILE* bin, int tam_bin, char tel[TEL_TAM], int *numPaginasA
 	}
 }
 
-void busca_nome (FILE* bin, int tam_bin, char* nome, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc){
+void busca_nome (FILE* bin, int tam_bin, char* nome, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
+	while(ftell(bin) != tam_bin){
+		
+		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
+		leUmRegistroBin(bin, rd, tam_pag);
+		if(strcmp(rd->nomeServidor, nome) == 0){
+			printaRegEncontrado(rc, rd);
+			(*achei) = 1;
+		}
 
+		if((*tam_pag) == 32000){
+			(*tam_pag) = 0;
+			//printf("Acessei uma pagina, proxima pagina\n");
+			(*numPaginasAcessadas)++;
+		}
+		free(rd);
+	}
 }
 
-void busca_cargo (FILE* bin, int tam_bin, char* cargo, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc){
+void busca_cargo (FILE* bin, int tam_bin, char* cargo, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei){
+	//printf("CARGO A PESQUISARRRR : %s\n", cargo);
+	while(ftell(bin) != tam_bin){
+		
+		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
+		leUmRegistroBin(bin, rd, tam_pag);
+		if(strcmp(rd->cargoServidor, cargo) == 0){
+			printaRegEncontrado(rc, rd);
+			(*achei) = 1;
+		}
 
+		if((*tam_pag) == 32000){
+			(*tam_pag) = 0;
+			//printf("Acessei uma pagina, proxima pagina\n");
+			(*numPaginasAcessadas)++;
+		}
+		free(rd);
+	}
 }
 
 void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tam_pag){
@@ -466,7 +497,7 @@ void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tam_pag){
 	fread(&tam,TAM_TAM,1,bin); // lendo o tamanho da proxima string, q pode ser nome ou campo
 	//printf("tam = %d\n", tam);
 	fread(&tag,TAG_TAM,1,bin); // lendo a tag da proxima string, q pode ser nome ou campo
-	//printf("tag = %c\n", tag);
+	
 	//printf("tam = %d\n", tam);
 	
 	//verificando se o campo será de nome ou campo

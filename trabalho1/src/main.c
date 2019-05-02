@@ -69,7 +69,6 @@ void buscaBin_Print(){
 
 	if(bin == NULL){
 		printf("Falha no processamento do arquivo.\n");
-		printf("Falha COISA NENHUMAAAA.\n");
 		return;
 	}
 
