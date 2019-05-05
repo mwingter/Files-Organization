@@ -86,3 +86,37 @@ endif
 	mkdir $(NAME)/$(BLDDIR)
 	mkdir $(NAME)/$(OBJDIR)
 	cp ./Makefile ./$(NAME)
+
+
+teste:
+	@clear
+	@make run < casoteste/1.in > saidas/meu1.out
+	@diff casoteste/1.out saidas/meu1.out
+	@make run < casoteste/2.in > saidas/meu2.out
+	@diff casoteste/2.out saidas/meu2.out
+	@make run < casoteste/3.in > saidas/meu3.out
+	@diff casoteste/3.out saidas/meu3.out
+	@make run < casoteste/4.in > saidas/meu4.out
+	@diff casoteste/4.out saidas/meu4.out
+	@make run < casoteste/5.in > saidas/meu5.out
+	@diff casoteste/5.out saidas/meu5.out
+	@make run < casoteste/6.in > saidas/meu6.out
+	@diff casoteste/6.out saidas/meu6.out
+	@make run < casoteste/7.in > saidas/meu7.out
+	@diff casoteste/7.out saidas/meu7.out
+	@make run < casoteste/8.in > saidas/meu8.out
+	@diff casoteste/8.out saidas/meu8.out
+	@make run < casoteste/9.in > saidas/meu9.out
+	@diff casoteste/9.out saidas/meu9.out
+	@make run < casoteste/10.in > saidas/meu10.out
+	@diff casoteste/10.out saidas/meu10.out
+	@make run < casoteste/11.in > saidas/meu11.out
+	@diff casoteste/11.out saidas/meu11.out
+	@make run < casoteste/12.in > saidas/meu12.out
+	@diff casoteste/12.out saidas/meu12.out
+	@make run < casoteste/13.in > saidas/meu13.out
+	@diff casoteste/13.out saidas/meu13.out
+	@make run < casoteste/14.in > saidas/meu14.out
+	@diff casoteste/14.out saidas/meu14.out
+	@make run < casoteste/15.in > saidas/meu15.out
+	@diff casoteste/15.out saidas/meu15.out

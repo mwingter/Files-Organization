@@ -63,7 +63,6 @@ void leBin_PrintBin(){
 void buscaBin_Print(){
 	char nomeBin[MAX], nomeCampo[MAX], valor[MAX];
 	scanf(" %s %s %[^\r\n]", nomeBin, nomeCampo, valor);
-	//printf("|%s|%s|%s|\n", nomeBin, nomeCampo, valor);
 
 	FILE* bin = fopen(nomeBin, "rb");
 
@@ -75,14 +74,15 @@ void buscaBin_Print(){
 	REGCAB* RC;
 	RC = calloc(1, sizeof(REGCAB));
 
-	leCabecalho(bin, RC);
+	leCabecalho(bin, RC); //lendo o cabeçalho da primeira pagina do arquivo
 
 	if (RC->status == '0') {
 		printf("Falha no processamento do arquivo.\n");
+		free(RC); fclose(bin);
 		return;
 	}
 
-	buscaRegBin(bin, RC, nomeCampo, valor);
+	buscaRegBin(bin, RC, nomeCampo, valor); //buscando o registro
 
 	free(RC);
 	fclose(bin);

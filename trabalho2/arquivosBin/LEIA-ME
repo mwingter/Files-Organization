@@ -1,0 +1,10 @@
+
+
+	Os arquivos binários estão no seguinte formato:
+		binario-x.bin
+		binario-x-depois.bin
+	onde x é o número do caso de teste.
+
+	O binario-x.bin é o que é passado como parâmetro no caso de teste,
+	e o binario-x-depois.bin é o resultado desse arquivo binário após execução (pode ser que ele mude ou não).
+
