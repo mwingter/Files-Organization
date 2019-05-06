@@ -48,5 +48,6 @@
 	void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tamanhoPagina);
 	void printaRegEncontrado(REGCAB* rc, REGDADOS* rd);
 	void freadString(FILE* bin, char* str);
+	void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, char* cargo);
 
 #endif

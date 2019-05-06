@@ -109,17 +109,55 @@ void remove_registro(){
 
 	for (int i = 0; i < n; ++i)
 	{
-		scanf("%s %s", nomeCampo, valorCampo);
-		//printf("nome e valor|%s|%s|\n", nomeCampo, valorCampo);
+		//scanf("%s %s", nomeCampo, valorCampo);
+		scanf("%s", nomeCampo);
+		scan_quote_string(valorCampo);
+		printf("nome e valor|%s|%s|\n", nomeCampo, valorCampo);
 		busca_RemoveReg(nomeBin, nomeCampo, valorCampo);
 	}
 	//fclose(bin); 
+	printf("Listar o arquivo binário %s.", nomeBin);
 }
 
 /*
  * Funcionalidade 1
+ valorIdServidor 1 valorSalarioServidor 1 valorTelefoneServidor 1
+valorNomeServidor 1 valorCargoServidor 1
 */
 void insere_registro(){
+	char nomeBin[MAX];
+	int n; //n = numero de vezes que a funcionalidade 4 será executada
+	scanf(" %s %d", nomeBin, &n);
+
+	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
+	int id; double sal;
+
+	for (int i = 0; i < n; ++i)
+	{
+		scanf("%s ", idStr);
+		scanf("%s ", salStr);
+		scan_quote_string(tel);
+		scan_quote_string(nome);
+		scan_quote_string(cargo);
+		printf("id|%s|, sal|%s|, tel|%s|, nome|%s|, cargo|%s|\n", idStr, salStr, tel, nome, cargo);
+		if(strcmp(idStr, "NULO") == 0){
+			id = 0;
+		}
+		else{
+			id = atoi(idStr);
+		}
+		if(strcmp(salStr, "NULO") == 0){
+			sal = 0;
+		}
+		else{
+			sal = atof(salStr);
+		}
+
+		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
+		criaNovoRegDados(rd, id, sal, tel, nome, cargo);
+		//	bestFit_insere(nomeBin, rd);
+		free(rd);
+	}
 
 }
 
@@ -172,7 +210,6 @@ aqueles que satisfaçam um critério de busca determinado pelo usuário.
 
 int main(int argc, char const *argv[])
 {
-
 	menu();
 	
 	return 0;
