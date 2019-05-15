@@ -22,3 +22,11 @@ tagCargo - 1 - char
 
 cargo - variavel - string
 
+
+
+
+
+cabeçalho
+status - 1 - char
+topoLista - 8 - long int 
+

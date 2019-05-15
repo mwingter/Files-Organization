@@ -107,37 +107,71 @@ void remove_registro(){
 
 	scanf(" %s %d", nomeBin, &n);
 
-	FILE* bin = fopen(nomeBin, "rb+");
-	if(bin == NULL){
-		printf("Falha no processamento do arquivo.\n");
-		return;
-	}
-
-	REGCAB* RC;
-	RC = calloc(1, sizeof(REGCAB));
-	leCabecalho(bin, RC); //lendo o cabeçalho da primeira pagina do arquivo
-
-	if (RC->status == '0') {
-		printf("Falha no processamento do arquivo.\n");
-		free(RC); fclose(bin);
-		return;
-	}
+	//criando lista de removidos
+	//NO_REG_REM* lista_rem;
 
 	for (int i = 0; i < n; ++i)
 	{
-		scanf("%s %s", nomeCampo, valorCampo);
-		busca_RemoveReg(bin, nomeCampo, valorCampo, RC);
+		//scanf("%s %s", nomeCampo, valorCampo);
+		scanf("%s", nomeCampo);
+		scan_quote_string(valorCampo);
+		//printf("nome e valor|%s|%s|\n", nomeCampo, valorCampo);
+		//lista_rem = calloc(1, sizeof(NO_REG_REM));
+		busca_RemoveReg(nomeBin, nomeCampo, valorCampo);
 	}
+	//fclose(bin); 
+	
+	binarioNaTela2(nomeBin);
+	//printf("\nListar o arquivo binário %s.", nomeBin);
 
 
-
-	fclose(bin);	
+	//free(lista_rem);
+	
 }
 
 /*
  * Funcionalidade 1
+ valorIdServidor 1 valorSalarioServidor 1 valorTelefoneServidor 1
+valorNomeServidor 1 valorCargoServidor 1
 */
 void insere_registro(){
+	char nomeBin[MAX];
+	int n; //n = numero de vezes que a funcionalidade 4 será executada
+	scanf(" %s %d", nomeBin, &n);
+
+	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
+	int id; double sal;
+	REGDADOS *rd;
+
+	for (int i = 0; i < n; ++i)
+	{
+		scanf("%s ", idStr);
+		scanf("%s ", salStr);
+		scan_quote_string(tel);
+		scan_quote_string(nome);
+		scan_quote_string(cargo);
+		printf("id|%s|, sal|%s|, tel|%s|, nome|%s|, cargo|%s|\n", idStr, salStr, tel, nome, cargo);
+		if(strcmp(idStr, "NULO") == 0){
+			id = 0;
+		}
+		else{
+			id = atoi(idStr);
+		}
+		if(strcmp(salStr, "NULO") == 0){
+			sal = 0;
+		}
+		else{
+			sal = atof(salStr);
+		}
+
+		rd = calloc(1, sizeof(REGDADOS));
+		criaNovoRegDados(rd, id, sal, tel, nome, cargo);
+		bestFit_insere(nomeBin, rd);
+		free(rd);
+	}
+
+	//binarioNaTela2(nomeBin);
+	//printf("Listar o arquivo binário %s.", nomeBin);
 
 }
 
@@ -190,7 +224,6 @@ aqueles que satisfaçam um critério de busca determinado pelo usuário.
 
 int main(int argc, char const *argv[])
 {
-
 	menu();
 	
 	return 0;

@@ -35,7 +35,7 @@ void salvaRegistroNaStruct(FILE* f, REGDADOS* r){
 		}
 	}
 
-	r->tamanhoRegistro = 8 + 4 + 8 + 14;
+	r->tamanhoRegistro = ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM;
 
 	if(r->nomeServidor[0] != '\0'){
 		r->nomeServidor[strlen(r->nomeServidor)] = '\0';
@@ -658,4 +658,18 @@ void printaRegEncontrado(REGCAB* rc, REGDADOS* rd) {
 	else{
 		printf("valor nao declarado\n\n");
 	}
+}
+
+void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, char* cargo){
+	rd->idServidor = id;
+	rd->salarioServidor = sal;
+	strcpy(rd->telefoneServidor,tel);
+	strcpy(rd->nomeServidor,nome);
+	strcpy(rd->cargoServidor,cargo);
+
+	rd->tamNomeServidor = strlen(nome) + 1;
+	rd->tamCargoServidor = strlen(cargo) + 1;
+	rd->removido = '-';
+	rd->tamanhoRegistro = ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM + rd->tamNomeServidor + rd->tamCargoServidor;
+	rd->encadeamentoLista = -1;
 }

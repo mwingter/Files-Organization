@@ -107,16 +107,26 @@ void remove_registro(){
 
 	scanf(" %s %d", nomeBin, &n);
 
+	//criando lista de removidos
+	//NO_REG_REM* lista_rem;
+
 	for (int i = 0; i < n; ++i)
 	{
 		//scanf("%s %s", nomeCampo, valorCampo);
 		scanf("%s", nomeCampo);
 		scan_quote_string(valorCampo);
-		printf("nome e valor|%s|%s|\n", nomeCampo, valorCampo);
+		//printf("nome e valor|%s|%s|\n", nomeCampo, valorCampo);
+		//lista_rem = calloc(1, sizeof(NO_REG_REM));
 		busca_RemoveReg(nomeBin, nomeCampo, valorCampo);
 	}
 	//fclose(bin); 
-	printf("Listar o arquivo binário %s.", nomeBin);
+	
+	binarioNaTela2(nomeBin);
+	//printf("\nListar o arquivo binário %s.", nomeBin);
+
+
+	//free(lista_rem);
+	
 }
 
 /*
@@ -131,6 +141,7 @@ void insere_registro(){
 
 	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
 	int id; double sal;
+	REGDADOS *rd;
 
 	for (int i = 0; i < n; ++i)
 	{
@@ -153,11 +164,14 @@ void insere_registro(){
 			sal = atof(salStr);
 		}
 
-		REGDADOS* rd = calloc(1, sizeof(REGDADOS));
+		rd = calloc(1, sizeof(REGDADOS));
 		criaNovoRegDados(rd, id, sal, tel, nome, cargo);
-		//	bestFit_insere(nomeBin, rd);
+		bestFit_insere(nomeBin, rd);
 		free(rd);
 	}
+
+	//binarioNaTela2(nomeBin);
+	//printf("Listar o arquivo binário %s.", nomeBin);
 
 }
 
