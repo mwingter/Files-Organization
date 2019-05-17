@@ -49,5 +49,6 @@
 	void printaRegEncontrado(REGCAB* rc, REGDADOS* rd);
 	void freadString(FILE* bin, char* str);
 	void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, char* cargo);
+	void criaNovoRegDados2(REGDADOS* rd, char* idStr, char* salStr, char* tel, char* nome, char* cargo);
 
 #endif

@@ -673,3 +673,57 @@ void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, c
 	rd->tamanhoRegistro = ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM + rd->tamNomeServidor + rd->tamCargoServidor;
 	rd->encadeamentoLista = -1;
 }
+
+void criaNovoRegDados2(REGDADOS* rd, char* idStr, char* salStr, char* tel, char* nome, char* cargo){
+	int id; double sal;
+	rd->tamanhoRegistro = 0;
+	if(strcmp(idStr, "NULO") == 0){
+		id = -1;
+	}
+	else{
+		id = atoi(idStr);
+	}
+	if(strcmp(salStr, "NULO") == 0){
+		sal = -1;
+	}
+	else{
+		sal = atof(salStr);
+	}
+
+	strcpy(rd->telefoneServidor,tel);
+	if(tel[0] != '('){
+		rd->telefoneServidor[0] = '\0';
+		for(int i = 1; i < 14; i++){
+			rd->telefoneServidor[i] = '@';
+		}
+	}
+
+	if(nome[0] != '\0'){
+		nome[strlen(nome)] = '\0';
+	}
+
+	if(cargo[0] != '\0'){
+		cargo[strlen(cargo)] = '\0';
+	}
+
+	rd->idServidor = id;
+	rd->salarioServidor = sal;
+	strcpy(rd->nomeServidor,nome);
+	strcpy(rd->cargoServidor,cargo);
+
+	rd->tamNomeServidor = 0;
+	if(strlen(nome) != 0){
+		rd->tamNomeServidor = strlen(nome) + 1;
+		rd->tamanhoRegistro += TAG_TAM + TAM_TAM;
+
+	}
+	rd->tamCargoServidor = 0;
+	if(strlen(cargo) != 0){
+		rd->tamCargoServidor = strlen(cargo) + 1;
+		rd->tamanhoRegistro += TAG_TAM + TAM_TAM;
+
+	}
+	rd->removido = '-';
+	rd->tamanhoRegistro  += ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM + rd->tamNomeServidor + rd->tamCargoServidor;
+	rd->encadeamentoLista = -1;
+}

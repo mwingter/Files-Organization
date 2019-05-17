@@ -97,13 +97,16 @@ void buscaBin_Print(){
 }
 
 /*
- * Funcionalidade 1
+ * Funcionalidade 4
 */
 void remove_registro(){
 	char nomeBin[MAX];
 	int n; //n = numero de vezes que a funcionalidade 4 será executada
 	char nomeCampo[MAX];
 	char valorCampo[MAX];
+
+	//int n_rem = 0;
+	//REG_REM* listaRem = NULL;
 
 	scanf(" %s %d", nomeBin, &n);
 
@@ -130,7 +133,7 @@ void remove_registro(){
 }
 
 /*
- * Funcionalidade 1
+ * Funcionalidade 5
  valorIdServidor 1 valorSalarioServidor 1 valorTelefoneServidor 1
 valorNomeServidor 1 valorCargoServidor 1
 */
@@ -140,8 +143,10 @@ void insere_registro(){
 	scanf(" %s %d", nomeBin, &n);
 
 	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
-	int id; double sal;
+	//int id; double sal;
 	REGDADOS *rd;
+
+	long int ultimo_reg = -1;
 
 	for (int i = 0; i < n; ++i)
 	{
@@ -150,41 +155,86 @@ void insere_registro(){
 		scan_quote_string(tel);
 		scan_quote_string(nome);
 		scan_quote_string(cargo);
-		printf("id|%s|, sal|%s|, tel|%s|, nome|%s|, cargo|%s|\n", idStr, salStr, tel, nome, cargo);
-		if(strcmp(idStr, "NULO") == 0){
-			id = 0;
+		//printf("id|%s|, sal|%s|, tel|%s|, nome|%s|, cargo|%s|\n", idStr, salStr, tel, nome, cargo);
+/*		if(strcmp(idStr, "NULO") == 0){
+			id = -1;
 		}
 		else{
 			id = atoi(idStr);
 		}
 		if(strcmp(salStr, "NULO") == 0){
-			sal = 0;
+			sal = -1;
 		}
 		else{
 			sal = atof(salStr);
 		}
+		if(tel[0] != '('){
+			tel[0] = '\0';
+			for(int i = 1; i < 14; i++){
+				tel[i] = '@';
+			}
+		}
+		if(nome[0] != '\0'){
+			nome[strlen(nome)] = '\0';
+		}
 
+		if(cargo[0] != '\0'){
+			cargo[strlen(cargo)] = '\0';
+		}
+*/
 		rd = calloc(1, sizeof(REGDADOS));
-		criaNovoRegDados(rd, id, sal, tel, nome, cargo);
-		bestFit_insere(nomeBin, rd);
+		//criaNovoRegDados(rd, id, sal, tel, nome, cargo);
+		criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
+//		printf("\n==========INSERINDO: \n\tid|%d|, sal|%lf|, tel|%s|, nome|%s|, cargo|%s|\n", rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+//		printf("TAMANHOS: \n\ttel = %ld\n\tnome = %d\n\tcargo = %d\n\t", strlen(tel), rd->tamNomeServidor, rd->tamCargoServidor);
+		firstFit_insere(nomeBin, rd, &ultimo_reg);
 		free(rd);
 	}
 
-	//binarioNaTela2(nomeBin);
+	binarioNaTela2(nomeBin);
 	//printf("Listar o arquivo binário %s.", nomeBin);
 
 }
 
 /*
- * Funcionalidade 1
+ * Funcionalidade 6
 */
 void atualiza_registro(){
+	char nomeBin[MAX];
+	int n; //n = numero de vezes que a funcionalidade 4 será executada
+	scanf(" %s %d", nomeBin, &n);
 
+	char nomeCampoBusca[MAX]; char valorCampoBusca[MAX];
+	char nomeCampoAtualiza[MAX]; char valorCampoAtualiza[MAX];
+
+	for (int i = 0; i < n; ++i){
+		scan_quote_string(nomeCampoBusca);
+		scan_quote_string(valorCampoBusca);
+		scan_quote_string(nomeCampoAtualiza);
+		scan_quote_string(valorCampoAtualiza);
+		if(strcmp(nomeCampoBusca, nomeCampoAtualiza) != 0 && strcmp(valorCampoBusca, valorCampoAtualiza) != 0){ //verifica se os campos são o mesmo, se for não faz nada
+			//busca_campo(nomeBin, nomeCampoBusca, valorCampoBusca);
+		}
+
+
+	}
 }
 
 void menu()
 {
 		/* FUNCIONALIDADES
+
+	[1] Permita a leitura de vários registros obtidos a partir de um arquivo de entrada
+(arquivo no formato CSV) e a gravação desses registros em um arquivo de dados de
+saída.
+	
+	[2] Permita a recuperação dos dados, de todos os registros, armazenados no arquivo de
+dados, mostrando os dados de forma organizada na saída padrão para permitir a
+distinção dos campos e registros.
+
+	[3] Permita a recuperação dos dados de todos os registros que satisfaçam um critério
+de busca determinado pelo usuário.
+
 	[4] Permita a remoção lógica de registros, baseado na abordagem dinâmica de
 reaproveitamento de espaços de registros logicamente removidos.
 
