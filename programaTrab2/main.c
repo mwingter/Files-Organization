@@ -192,8 +192,6 @@ void insere_registro(){
 	}
 
 	binarioNaTela2(nomeBin);
-	//printf("Listar o arquivo binário %s.", nomeBin);
-
 }
 
 /*

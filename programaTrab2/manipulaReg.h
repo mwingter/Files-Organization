@@ -13,6 +13,7 @@
 		long int encadeamentoLista;
 	};
 
+	//============== REMOÇÃO ======================
 	void novo_no_removido(REG_REM* reg_vazio, long int pos, int tam, long int proxRem);
 	REG_REM* lista_removidos(FILE* bin, REG_REM* lista, int* numero_registros_removidos);
 	int int_compare_tam(const void *A, const void *B);
@@ -31,15 +32,17 @@
 	void printaUmReg(REGDADOS* rd);
 	void volta_le_Eprinta_umRegistro(FILE*bin, int tamReg);
 	
+	//================ INSERÇÃO ====================
 	void firstFit_insere(char* nomeBin, REGDADOS* rd, long int* ultimo_reg);
-	void achaBestFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg);
+	void achaFirstFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg);
 	void atualizaTopoEncadLista_aposInserir(FILE* bin, long int encadLista_anterior, long int encadLista_atual, int indice_lista);
 	//void achaPosicaoBestFit(char* nomeBin, REGDADOS* rd);
 	void insere_umReg_naPos(FILE* bin, REGDADOS* rd, long int pos/*, int tam_reg_noBin*/);
 	void insere_umReg_noFim(FILE* bin, REGDADOS* rd, long int* ultimo_reg);
 	//int tamanho_BestFit(int* tamanhos_ordenado, int tam_reg, int n_reg);
-	//long int achaBestFit(FILE* bin, int tam_reg, int tam_bin, int*tam_reg_noBin);
+	//long int achaFirstFit(FILE* bin, int tam_reg, int tam_bin, int*tam_reg_noBin);
 
+	//================ ATUALIZAÇÃO ===================
 	long int busca_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX]);
 
 #endif

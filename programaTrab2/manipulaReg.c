@@ -549,7 +549,8 @@ void firstFit_insere(char* nomeBin, REGDADOS* rd, long int* ultimo_reg){
 	FILE* bin = fopen(nomeBin, "rb+");
 	if(bin == NULL){
 		printf("Falha no processamento do arquivo.\n");
-		return;
+		//fclose(bin);
+		exit(0);
 	}
 
 	char status = 0;
@@ -560,38 +561,18 @@ void firstFit_insere(char* nomeBin, REGDADOS* rd, long int* ultimo_reg){
 	if (status == '0') {
 		printf("Falha no processamento do arquivo.\n");
 		fclose(bin);
-		return;
+		exit(0);
 	}
-	//fclose(bin);
-	//int tam_bin = tamArquivo(bin);
-	//=======================
-
-	//int tam_lixo = 0;
-
-	//long int pos_bestFit = achaPosicaoBestFit(bin, rd->tamanhoRegistro);
-	//achaPosicaoBestFit(nomeBin, rd);
-/*
-	if(pos_bestFit == -1){
-		//tam_bin = (long int) tam_bin;
-		insere_umReg_noFim(bin, rd, tam_bin);
-	}
-	else{
-		insere_umReg_naPos(bin, rd, pos_bestFit, tam_lixo);
-	}
-*/
 
 
 
-	achaBestFit_eInsereReg(bin, rd, ultimo_reg);
+	achaFirstFit_eInsereReg(bin, rd, ultimo_reg);
 	fclose(bin);
-
-
-
 
 }
 
-void achaBestFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
-//	printf("entrando em achaBestFit_eInsereReg\n");
+void achaFirstFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
+//	printf("entrando em achaFirstFit_eInsereReg\n");
 	int tam_bin = tamArquivo(bin); //tamanho do arquivo
 	long int topoLista = 0;
 
@@ -620,7 +601,7 @@ void achaBestFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 	while(ftell(bin) < tam_bin/* && encadLista_atual != -1*/){			//os reg removidos estão encadeados por tamanho, do menor pro menor
 		if(encadLista_atual == -1){ //então não há espaços de registros removidos. Inserir no FIM
 			insere_umReg_noFim(bin, rd, ultimo_reg);
-			//atualizaTopoEncadLista_aposInserir(bin, encadLista_anterior, encadLista_atual, indice_lista);
+			atualizaTopoEncadLista_aposInserir(bin, encadLista_anterior, encadLista_atual, indice_lista);
 			return;
 		}
 		fseek(bin, encadLista_atual, SEEK_SET);
@@ -673,59 +654,6 @@ void atualizaTopoEncadLista_aposInserir(FILE* bin, long int encadLista_anterior,
 	fwrite(&encadLista_atual, TOPO_TAM, 1, bin);
 }
 
-
-/*
-void achaPosicaoBestFit(char* nomeBin, REGDADOS* rd){
-	FILE* bin = fopen(nomeBin, "rb+");
-	int tam_reg = rd->tamanhoRegistro;
-	REG_REM* listaRem = NULL;
-	int n_rem = 0;
-	listaRem = lista_removidos(bin, listaRem, &n_rem);
-	int tam_lixo = 0;
-
-	for (int i = 0; i < n_rem; ++i)
-	{
-		printf("[TAM = %d, POS = %ld, ENC = %ld]\n", listaRem[i].tam, listaRem[i].pos, listaRem[i].encadeamentoLista);
-	}
-	printf("\n");
-
-	int menor_sobra = listaRem[0].tam - tam_reg;
-	int sobra_aux = 0;
-	int indice_bestFit = 0;
-	int achei_pos = -1;
-
-	for(int i = 0; i < n_rem; i++){
-		printf("For1\n");
-		sobra_aux = listaRem[i].tam - tam_reg;
-		if(menor_sobra > sobra_aux){
-			menor_sobra = sobra_aux;
-			indice_bestFit = i;
-			achei_pos = 1;
-			tam_lixo = menor_sobra;
-		}
-	}
-
-	if(achei_pos == -1){
-		insere_umReg_noFim(bin, rd);
-	}
-	else{
-		long int pos = listaRem[indice_bestFit].pos;
-		insere_umReg_naPos(bin, rd, pos, tam_lixo);
-	}
-	free(listaRem);
-	//return pos;
-	listaRem = NULL;
-	n_rem = 0;
-	listaRem = lista_removidos(bin, listaRem, &n_rem);
-	fclose(bin);
-
-
-	ordenaLista_atualizaEncAndTopoLista(nomeBin, listaRem, n_rem);
-	free(listaRem);
-
-
-}*/
-
 void insere_umReg_naPos(FILE* bin, REGDADOS* rd, long int pos/*, int tam_lixo*/){
 //	printf("insere_umReg_naPos\n");
 	rewind(bin);
@@ -746,15 +674,7 @@ void insere_umReg_naPos(FILE* bin, REGDADOS* rd, long int pos/*, int tam_lixo*/)
 		strcpy(rd->telefoneServidor, "\0@@@@@@@@@");
 	}
 	fwrite(&rd->telefoneServidor, TEL_TAM * sizeof(char), 1, bin);
-/*
-	fwrite(&rd->tamNomeServidor, TAM_TAM, 1, bin);
-	fwrite(&tagN, TAG_TAM, 1, bin);
-	fwrite(&rd->nomeServidor, rd->tamNomeServidor - 1, 1, bin);
-	
-	fwrite(&rd->tamCargoServidor, TAM_TAM, 1, bin);
-	fwrite(&tagC, TAG_TAM, 1, bin);
-	fwrite(&rd->cargoServidor, rd->tamCargoServidor - 1, 1, bin);
-*/
+
 	if(rd->nomeServidor[0] != '\0'){
 		int tamanho2 = strlen(rd->nomeServidor) + 2;
 		fwrite(&tamanho2, TAM_TAM, 1, bin);
@@ -769,45 +689,50 @@ void insere_umReg_naPos(FILE* bin, REGDADOS* rd, long int pos/*, int tam_lixo*/)
 		fwrite(&rd->cargoServidor, strlen(rd->cargoServidor)  * sizeof(char) + 1, 1, bin);
 	}
 
-/*
-	for (int i = 0; i < tam_lixo; ++i)
-	{
-		fwrite(&lixo, sizeof(char), 1, bin);
-	}
-*/
-
-
-
 }
 
 void insere_umReg_noFim(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 //	printf("entrando em insere_umReg_noFim\n");
-	int pos = tamArquivo(bin);
-	//rewind(bin);
-	fseek(bin, pos, SEEK_CUR);
-
 	char tagN = 'n';
 	char tagC = 'c';
-/*
-	tam_restante_pagina = 32000 - (pos % 32000); //calculando o espaço restante na pagina de disco atual pra saber se o registro cabe nela
-	
-	(*ultimo_reg) = ; //posição inicial do ultimo registro
 
-	if(tam_restante_pagina < rd->tamanhoRegistro+REM_TAM+TAM_TAM){ // se o tamanho que ainda resta na pagina for menor que o tamanho do registro que quero inserir, 
-		char arroba = '@';							// preencho ela com arroba e vou pra proxima pagina
+	char removido;
+	fseek(bin, (*ultimo_reg), SEEK_SET);
+	fread(&removido, TAM_TAM, 1, bin);
+	//printf("REmovido do ultimo registro antes de inserir = |%c|\n", removido);
+	if(removido == '*'){ //caso o ultimo registro seja um registro removido com pouco espaço.
+		insere_umReg_naPos(bin, rd, (*ultimo_reg));
+		return;
+	}
+
+	int tamRegAnterior = 0;
+	fread(&tamRegAnterior, TAM_TAM, 1, bin); //tamanho do registro anterior
+
+	//rewind(bin);
+	//fseek(bin, pos, SEEK_SET);
+
+	fseek(bin, 0, SEEK_END); //indo pro final do arquivo
+	int pos = ftell(bin);
+
+	//calculando o espaço restante na pagina de disco atual pra saber se o registro cabe nela
+	int tam_restante_pagina = TAM_PAG_DISCO - (pos % TAM_PAG_DISCO); 
+
+	if(tam_restante_pagina < rd->tamanhoRegistro + REM_TAM + TAM_TAM){ // se o tamanho que ainda resta na pagina for menor que o tamanho do registro que quero inserir,
+		char arroba = '@';												// preencho ela com arroba, incremendo o tamanho do registro anterior e vou pra proxima pagina
 		
 		for(int i = 0; i < tam_restante_pagina; i++){
 			fwrite(&arroba, sizeof(char), 1, bin);
-			(*tamRegAnterior) = (*tamRegAnterior) + 1;
+			tamRegAnterior = tamRegAnterior + 1;
 		}
 
-		//adicionar o tamanho desses arrobas no ultimo registro da pagina
-		//fseek(bin, -(*tamRegAnterior + 4), SEEK_CUR);
-		//fwrite(&(*tamRegAnterior), sizeof(int), 1, bin);
+		//atualizar o tamanho do ultimo registro da pagina (ou seja, com o tamanho desses arrobas adicionados)
+		fseek(bin, -(tamRegAnterior + TAM_TAM), SEEK_CUR);
+		fwrite(&tamRegAnterior, TAM_TAM, 1, bin);
 
 		fseek(bin, 0, SEEK_END);
 	}
-*/
+
+	(*ultimo_reg) = ftell(bin); //posição inicial do ultimo registro
 
 	fwrite(&rd->removido, REM_TAM, 1, bin); //reescrevendo o removido de '*' para '-'
 	fwrite(&rd->tamanhoRegistro, TAM_TAM, 1, bin);
@@ -817,14 +742,6 @@ void insere_umReg_noFim(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 	fwrite(&rd->salarioServidor, SAL_TAM, 1, bin);
 	fwrite(&rd->telefoneServidor, TEL_TAM, 1, bin);
 
-/*	fwrite(&rd->tamNomeServidor, TAM_TAM, 1, bin);
-	fwrite(&tagN, TAG_TAM, 1, bin);
-	fwrite(&rd->nomeServidor, rd->tamNomeServidor - 1, 1, bin);
-	
-	fwrite(&rd->tamCargoServidor, TAM_TAM, 1, bin);
-	fwrite(&tagC, TAG_TAM, 1, bin);
-	fwrite(&rd->cargoServidor, rd->tamCargoServidor - 1, 1, bin);
-*/
 	if(rd->nomeServidor[0] != '\0'){
 		int tamanho2 = strlen(rd->nomeServidor) + 2;
 		fwrite(&tamanho2, TAM_TAM, 1, bin);
@@ -841,128 +758,6 @@ void insere_umReg_noFim(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 
 }
 
-
-
-
-
-
-/*
- * tamanho_bestFit
- * Função: Percorre o vetor ordenado com os tamanhos dos registros removidos existentes, procurando pelo tamanho do melhor bestFit de acordo com o tamanho do registro dado
- * Parâmetros: 	
- 				tamanhos_ordenados: Vetor ordenado com os tamanhos dos registros removidos existentes.
- 				tam_reg: Tamanho do registro
- 				n_reg: numero de itens do vetor
-
- 	Retorno: Tamanho do melhor bestFit 
-*/
-/*
-int tamanho_BestFit(int* tamanhos_ordenado, int tam_reg, int n_reg){
-	int tamanho1 = 0;
-	int tamanho2 = 0;
-	int sobra1 = 0;
-	int sobra2 = 0;
-	//int menor_sobra = tamanhos_ordenado;
-	int best_fit_tam = -1;
-
-	for (int i = 1; i < n_reg; ++i)
-	{
-		tamanho1 = tamanhos_ordenado[i-1];
-		tamanho2 = tamanhos_ordenado[i];
-		sobra1 = tamanho1 - tam_reg;
-		sobra2 = tamanho2 - tam_reg;
-		if(sobra1 < sobra2 && sobra1 < menor_sobra && tam_reg >= sobra1){
-			best_fit_tam = tamanho1;
-			menor_sobra = sobra1;
-		}
-		else if(sobra2 < sobra1 && tam_reg >= sobra2){
-			best_fit_tam = tamanho2;
-			menor_sobra = sobra2;
-		}
-	}
-
-
-	return best_fit_tam;
-}*/
-
-/*
- * posicao_BestFit
- * Função: Percorre um vetor de tamanhos de registros (vetor_tamanhos) procurando pelo indice do best fit recebido, 
- 			que também é o indice da sua posição no arquivo no vetor vetor_posicao, encontrando a posição do best fit.
-
- * Parâmetros: 	
- 				best_fit_tam: Tamanho do best fit
- 				vetor_tamanhos: Vetor com os tamanhos dos registros na ordem em que estão no arquivo
- 				vetor_posicao: Vetor com as posições dos registros na ordem em que estão no arquivo
- 				tam_vetor: numero de elementos dos vetores vetor_tamanhos e vetor_posicao
- 				pos: Posição do best fit
-
- 	Retorno: posição no arquivo do melhor bestFit 
-*/
-/*
-void posicao_BestFit(int best_fit_tam, int *vetor_tamanhos, long int *vetor_posicao, int tam_vetor, long int *pos){
-	for (int i = 0; i < tam_vetor; ++i)
-	{
-		if(best_fit_tam == vetor_tamanhos[i]){
-			(*pos) = vetor_posicao[i];
-			return;
-		}
-	}
-}*/
-
-/*
- * achaBestFit
- * Função: Lê um arquivo binário e acha o best Fit para um registro de um dado tamanho e retorna a posição do best fit encontrado
- * Parâmetros: 	
- 				bin: Arquivo binário
- 				tam_reg: Tamanho do registro
- 				tam_bin: Tamanho do arquivo binário
-
- 	Retorno: Tamanho do melhor bestFit 
-*/
-/*
-long int achaBestFit(FILE* bin, int tam_reg, int tam_bin, int*tam_lixo){
-	int *tamanhos;
-	int *tam_aux;
-	long int *posicao;
-	int countReg = 0;
-	char removido;
-	int tamRegAux;
-	long int bestFit_posicao = 0;
-
-	while(ftell(bin) != tam_bin){
-		fread(&removido, REM_TAM, 1, bin);
-		fread(&tamRegAux, TAM_TAM, 1, bin); //lê e guarda o tamanho do 
-		if(removido == '*'){
-			tamanhos = calloc(countReg, sizeof(int));
-			tam_aux = calloc(countReg, sizeof(int));
-			posicao = calloc(countReg, sizeof(long int));
-
-			tamanhos[countReg] = tamRegAux;
-			tam_aux[countReg] = tamRegAux;
-			posicao[countReg] = ftell(bin) - REM_TAM; //posição da variavel 'removido' do registro
-
-			countReg++;
-		}
-		fseek(bin, tamRegAux, SEEK_CUR);
-	}
-
-	//ordenando o vetor de tamanhos auxiliar
-	MS_sort(tam_aux, countReg, sizeof(int), int_compare_tam);
-
-	//comparando os tamanhos pra achar o best_fit
-	//int best_fit_tam = tamanho_BestFit(tam_aux, tam_reg, countReg);
-
-	//procurando o indice do tamanho encontrado
-	//posicao_BestFit(best_fit_tam, tamanhos, posicao, countReg, &bestFit_posicao);
-
-	//tamanho que vai sobrar no registro após inserção
-	//(*tam_lixo) = best_fit_tam - tamRegAux;
-
-	rewind(bin);
-
-	return bestFit_posicao;
-}*/
 
 //=========================== CÓDIGOS PARA ATUALIZAÇÃO ===============================
 //busca um campo com o valor dado, e retorna sua posição caso encontre, ou -1 caso contrário.
