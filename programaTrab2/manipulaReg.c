@@ -96,7 +96,7 @@ void busca_RemoveReg(char* nomeBin, char* nomeCampo, char* valorCampo){
 	FILE* bin = fopen(nomeBin, "rb+");
 	if(bin == NULL){
 		printf("Falha no processamento do arquivo.\n");
-		return;
+		exit(0);
 	}
 
 	char status;
@@ -108,7 +108,7 @@ void busca_RemoveReg(char* nomeBin, char* nomeCampo, char* valorCampo){
 	if (status == '0') {
 		printf("Falha no processamento do arquivo.\n");
 		fclose(bin);
-		return;
+		exit(0);
 	}
 	//=======================
 	int tam_bin = tamArquivo(bin);
@@ -572,7 +572,7 @@ void firstFit_insere(char* nomeBin, REGDADOS* rd, long int* ultimo_reg){
 }
 
 void achaFirstFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
-//	printf("entrando em achaFirstFit_eInsereReg\n");
+	//printf("entrando em achaFirstFit_eInsereReg\n");
 	int tam_bin = tamArquivo(bin); //tamanho do arquivo
 	long int topoLista = 0;
 
@@ -601,7 +601,7 @@ void achaFirstFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 	while(ftell(bin) < tam_bin/* && encadLista_atual != -1*/){			//os reg removidos estão encadeados por tamanho, do menor pro menor
 		if(encadLista_atual == -1){ //então não há espaços de registros removidos. Inserir no FIM
 			insere_umReg_noFim(bin, rd, ultimo_reg);
-			atualizaTopoEncadLista_aposInserir(bin, encadLista_anterior, encadLista_atual, indice_lista);
+			//atualizaTopoEncadLista_aposInserir(bin, encadLista_anterior, encadLista_atual, indice_lista);
 			return;
 		}
 		fseek(bin, encadLista_atual, SEEK_SET);
@@ -611,8 +611,8 @@ void achaFirstFit_eInsereReg(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 		fread(&tam_aux, TAM_TAM, 1, bin);
 		fread(&encadLista_atual, ENC_TAM, 1, bin);
 	
-//		printf("LENDO : %c %d %ld\n", removido, tam_aux, encadLista_atual);
-//		printf("[Tamanho disponivel = %d\n\tTamanho do reg = %d\n]", tam_aux, rd->tamanhoRegistro);
+		//printf("LENDO : %c %d %ld\n", removido, tam_aux, encadLista_atual);
+	//	printf("[Tamanho disponivel = %d\n\tTamanho do reg = %d\n]", tam_aux, rd->tamanhoRegistro);
 		//if(removido == '*'){
 //			printf("removido [%d]\n", indice_lista);
 			indice_lista++;
@@ -655,7 +655,7 @@ void atualizaTopoEncadLista_aposInserir(FILE* bin, long int encadLista_anterior,
 }
 
 void insere_umReg_naPos(FILE* bin, REGDADOS* rd, long int pos/*, int tam_lixo*/){
-//	printf("insere_umReg_naPos\n");
+	//printf("insere_umReg_naPos\n");
 	rewind(bin);
 
 	char tagN = 'n';
@@ -761,36 +761,49 @@ void insere_umReg_noFim(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
 
 //=========================== CÓDIGOS PARA ATUALIZAÇÃO ===============================
 //busca um campo com o valor dado, e retorna sua posição caso encontre, ou -1 caso contrário.
-long int busca_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX]){
-	FILE* bin = fopen(nomeBin, "rb+")	;
+void busca_atualiza_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX], char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg){
+	FILE* bin = fopen(nomeBin, "rb+");
+	if(bin == NULL){
+		printf("Falha no processamento do arquivo.\n");
+		exit(0);
+	}
+	char status = 0;
+	fread(&status, STATUS_TAM, 1, bin);
+	//checando status do arquivo
+	if (status == '0') {
+		printf("Falha no processamento do arquivo.\n");
+		fclose(bin);
+		exit(0);
+	}
 
 	int achei = 0;
-	//int tam_bin = tamArquivo(bin);
-	int tam_pag = 0;
+	int tam_bin = tamArquivo(bin);
+	//int tam_pag = 0;
 	fseek(bin, TAM_PAG_DISCO, SEEK_CUR);
-	int numPaginasAcessadas = 1; //ja acessei o Registro de cabeçalho na primeira pagina
 
 
 	if(strcmp(nomeCampo,"idServidor") == 0){
 		//printf("vou procurar o id");
-		//int id = atoi(valor);
-		//busca_e_atualiza_id();
+		int id = atoi(valor);
+		atualiza_id(bin, tam_bin, id, &achei, nomeCampoAtualiza, valorCampoAtualiza, ultimo_reg);
 		
 	}
 	else if(strcmp(nomeCampo, "salarioServidor") == 0){
-		//double sal = atof(valor);
-		//atualiza_sal();
+		double sal = atof(valor);
+		atualiza_salario(bin, tam_bin, sal, &achei, nomeCampoAtualiza, valorCampoAtualiza, ultimo_reg);
 		
 	}
 	else if(strcmp(nomeCampo, "telefoneServidor") == 0){
 		char tel[TEL_TAM];
 		strcpy(tel, valor);
+		atualiza_telefone(bin, tam_bin, tel, &achei, nomeCampoAtualiza, valorCampoAtualiza, ultimo_reg);
 		
 	}
 	else if(strcmp(nomeCampo,"nomeServidor") == 0){
 		char* nome;
 		nome = calloc(strlen(valor)+1, sizeof(char));
 		strcpy(nome, valor);
+		atualiza_nome(bin, tam_bin, nome, &achei, nomeCampoAtualiza, valorCampoAtualiza, ultimo_reg);
 		
 		free(nome);
 
@@ -799,25 +812,138 @@ long int busca_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX]){
 		char* cargo;
 		cargo = calloc(strlen(valor)+1, sizeof(char));
 		strcpy(cargo, valor);
+		atualiza_cargo(bin, tam_bin, cargo, &achei, nomeCampoAtualiza, valorCampoAtualiza, ultimo_reg);
 		
 		free(cargo);
 	}
+
+
+	if(achei == 0){
+	//	printf("Não achei nada pra atualizar, campo = %s, valor = %s\n", nomeCampo, valor);
+	}
+
+	int n_rem = 0;
+	REG_REM* listaRem = NULL;
+	listaRem = lista_removidos(bin, listaRem, &n_rem);
+	ordenaLista_atualizaEncAndTopoLista(nomeBin, listaRem, n_rem);
 	
-	if(tam_pag > 0 && tam_pag < 32000){
-		numPaginasAcessadas++;
-	}
-	if(achei > 0){
-		//printf("Número de páginas de disco acessadas: %d\n", numPaginasAcessadas);
-		return numPaginasAcessadas;
-	}
-	else{
-		//printf("Registro inexistente.\n");
-		return -1;
-	}
+	free(listaRem);
+	fclose(bin);
+	
 }
 
+void atualiza_UmRegistro(REGDADOS* rd, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX]){
+	//printf("\nAtualizando registro de ID = %d\n\t====== TAM do Reg ANTES = %d\n", rd->idServidor, rd->tamanhoRegistro);
+	int tam_reg_aux = ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM;
+	//printf("tam_reg_aux mais os fixos = %d\n", tam_reg_aux);
+
+	int id = 0;
+	double sal = 0;
+	if(strcmp(nomeCampoAtualiza,"idServidor") == 0){
+		if(strcmp(valorCampoAtualiza, "NULO") == 0){
+			id = -1;
+		}
+		else{
+			id = atoi(nomeCampoAtualiza);
+		}		
+		rd->idServidor = id;
+	}
+
+	else if(strcmp(nomeCampoAtualiza, "salarioServidor") == 0){
+		if(strcmp(valorCampoAtualiza, "NULO") == 0){
+			sal = -1;
+		}
+		else{
+			sal = atof(valorCampoAtualiza);
+		}
+		rd->salarioServidor = sal;
+		
+	}
+	else if(strcmp(nomeCampoAtualiza, "telefoneServidor") == 0){
+		char tel[TEL_TAM];
+		strcpy(tel, valorCampoAtualiza);
+		strcpy(rd->telefoneServidor, tel);
+
+		if(tel[0] != '('){
+			rd->telefoneServidor[0] = '\0';
+			for(int i = 1; i < 14; i++){
+				rd->telefoneServidor[i] = '@';
+			}
+		}
+		
+	}
+	else if(strcmp(nomeCampoAtualiza,"nomeServidor") == 0){
+		char* nome;
+		nome = calloc(strlen(valorCampoAtualiza)+1, sizeof(char));
+		strcpy(nome, valorCampoAtualiza);
+		strcpy(rd->nomeServidor, nome);
+		
+		if(nome[0] != '\0'){
+			rd->nomeServidor[strlen(nome)] = '\0';
+		}
+
+		if(strlen(nome) != 0){
+			int tam_nome_antes = rd->tamNomeServidor;
+			rd->tamNomeServidor = strlen(rd->nomeServidor);
+			if(tam_nome_antes == 0){
+				//rd->tamNomeServidor += 1;
+			}
+		//	tam_reg_aux += TAG_TAM + TAM_TAM;
+			//printf("tam_reg_aux antes = %d\n", tam_reg_aux);
+
+		}
+		free(nome);
+
+	}
+	else if(strcmp(nomeCampoAtualiza, "cargoServidor") == 0){
+		char* cargo;
+		cargo = calloc(strlen(valorCampoAtualiza)+1, sizeof(char));
+		strcpy(cargo, valorCampoAtualiza);
+		//printf("\t\t\tCargo antes de atualizar = %s, tam = %ld\n", rd->cargoServidor, strlen(rd->cargoServidor));
+		strcpy(rd->cargoServidor, cargo);
+		//printf("\t\t\tCargo depois de atualizar = %s, tam = %ld\n", rd->cargoServidor, strlen(rd->cargoServidor));
+
+		
+		if(cargo[0] != '\0'){
+		//	printf("**botei barra zero no cargo\n");
+			rd->cargoServidor[strlen(cargo)] = '\0';
+		}
+		
+		if(strlen(rd->cargoServidor) != 0){
+		//	printf("incrementei o tam do cargo no registro\n");
+			int tam_antes = rd->tamCargoServidor;
+			rd->tamCargoServidor = strlen(rd->cargoServidor);
+			if(tam_antes == 0){
+				//rd->tamCargoServidor += 1;
+			}
+			//printf("tam_reg_aux antes = %d\n", tam_reg_aux);
+			//tam_reg_aux += TAG_TAM + TAM_TAM;
+			//printf("tam_reg_aux depois = %d\n", tam_reg_aux);
+
+		}
+		free(cargo);
+	}
+	if(strlen(rd->nomeServidor) > 0){
+			tam_reg_aux += TAG_TAM + TAM_TAM;
+	}
+	if(strlen(rd->cargoServidor) > 0){
+			tam_reg_aux += TAG_TAM + TAM_TAM;
+	}
+
+	tam_reg_aux += rd->tamNomeServidor + rd->tamCargoServidor;
+	//printf("tam nome = %d, tam cargo = %d\n", rd->tamNomeServidor, rd->tamCargoServidor);
+
+
+	if(tam_reg_aux > rd->tamanhoRegistro){
+		rd->tamanhoRegistro = tam_reg_aux; //só vou mudar no tamanho do registro no arquivo se o atualizado for maior que o antigo
+	}
+
+	//printf("\t====== TAM do Reg ATUALIZADO = %d\n\t====== TAM FINAL SALVO = %d\n\n", tam_reg_aux, rd->tamanhoRegistro);
+}
+
+
 /*
- * remove_id
+ * atualiza_id
  * Função: Busca dados do tipo idServidor em um dado arquivo binário e o remove
  * Parâmetros: 	
  				bin: Arquivo binário
@@ -826,38 +952,45 @@ long int busca_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX]){
  				id: Valor do id que quero buscar
  				achei: variavel que indica se encontrei registros ou não
 */
-void busca_id_e_atualiza (FILE* bin, int tam_bin, int id, int *achei){
+void atualiza_id (FILE* bin, int tam_bin, int id, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg){
+	//printf("Buscando o id |%d|\n", id);
 	int lixo = 0;
-	//char removido = '*';
-	//long int encadeamento = -1;
-	//char arroba = '@';
 	REGDADOS* rd;
-	//printf("Quero remover o id |%d|\n", id);
+	long int pos = 0;
 
 	//rewind(bin);
 
 	while(ftell(bin) != tam_bin){
 		
 		rd = calloc(1, sizeof(REGDADOS));
+		pos = ftell(bin);
 		leUmRegistroBin(bin, rd, &lixo);
-		if(rd->idServidor == id){
-			//====removendo registro====
-			//printf("tam reg eh %d\n", rd->tamanhoRegistro);
-		//	printf("ACHEI O ID Q QUERO REMOVER!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
-		/*	fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
-			fwrite(&removido, REM_TAM, 1, bin); //reescrevendo o valor de removido para '*', indicando que o registro foi removido
-			fseek(bin, TAM_TAM, SEEK_CUR); //pulando o tamanhoRegistro
-			fwrite(&encadeamento, ENC_TAM, 1, bin); //reescrevendo o valor de EncadeamentoLista com o novo valor
-			for(int i = 0; i < rd->tamanhoRegistro - ENC_TAM; i++){
-				fwrite(&arroba, sizeof(char), 1, bin); //completando o registro com lixo
-			} //completando o registro com lixo
-		*/	//==========================
-			remove_registro_generico(bin, rd->tamanhoRegistro);
+		if(rd->idServidor == id){ //encontrei registro no arquivo
 			(*achei) = 1;
+			//====atualizando registro====
+			int tam_reg_aux = rd->tamanhoRegistro;
+			//printf("|ANTES| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//printf("ACHEI O ID Q QUERO ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			atualiza_UmRegistro(rd, nomeCampoAtualiza, valorCampoAtualiza);
+			//printf("DEPOIS DE ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			//printf("|DEPOIS| tam do reg eh %d\n", rd->tamanhoRegistro);
+			
+			if(tam_reg_aux >= rd->tamanhoRegistro){ //se o tamanho antigo do registro for maior ou igual, então o registro atualizado permanece ali
+				//printf("Atualizando sem remover e inserir\n");
+				//fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
+				insere_umReg_naPos(bin, rd, pos);
+			}
+			//long int ultimo_reg = 0;
+			else{
+				//senão o registro é removido e inserido em outro lugar
+			//	printf("Atualizando COM inserção e remoção!\n");
+				remove_registro_generico(bin, tam_reg_aux);
+				achaFirstFit_eInsereReg(bin, rd, ultimo_reg);
+			}
 			
 			//teste
 			//printf("\n\t### Testando Registro depois de modificado ###\n");
-			//volta_le_Eprinta_umRegistro(bin, rd->tamanhoRegistro);
+			//volta_le_Eprinta_umRegistro(bin, tam_reg_aux);
 
 			free(rd);
 			return;
@@ -879,38 +1012,47 @@ void busca_id_e_atualiza (FILE* bin, int tam_bin, int id, int *achei){
  				tam_pag: ponteiro para controlar o tamanho da pagina
  				achei: variavel que indica se encontrei registros ou não
 */
-void atualiza_salario (FILE* bin, int tam_bin, double sal, int *achei){
+void atualiza_salario (FILE* bin, int tam_bin, double sal, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg){
+	//printf("Quero atualizar o salario |%lf|\n", sal);
 	int lixo = 0;
-	//char removido = '*';
-	//long int encadeamento = -1;
-	//char arroba = '@';
 	REGDADOS* rd;
-	//printf("Quero remover o salario |%lf|\n", sal);
-
-	//rewind(bin);
+	long int pos = 0;
+	long int pos_prox = 0;
 
 	while(ftell(bin) != tam_bin){
 		
 		rd = calloc(1, sizeof(REGDADOS));
+		pos = ftell(bin);
 		leUmRegistroBin(bin, rd, &lixo);
+		pos_prox = ftell(bin);
 		if(rd->salarioServidor == sal){
-			//====removendo registro====
-			//printf("tam reg eh %d\n", rd->tamanhoRegistro);
-		//	printf("ACHEI O SAL Q QUERO REMOVER!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
-			/*fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
-			fwrite(&removido, REM_TAM, 1, bin); //reescrevendo o valor de removido para '*', indicando que o registro foi removido
-			fseek(bin, TAM_TAM, SEEK_CUR); //pulando o tamanhoRegistro
-			fwrite(&encadeamento, ENC_TAM, 1, bin); //reescrevendo o valor de EncadeamentoLista com o novo valor
-			for(int i = 0; i < rd->tamanhoRegistro - ENC_TAM; i++){
-				fwrite(&arroba, sizeof(char), 1, bin); //completando o registro com lixo
-			} //completando o registro com lixo
-		*/	//==========================
-			remove_registro_generico(bin, rd->tamanhoRegistro);
 			(*achei) = 1;
+			//====atualizando registro====
+			int tam_reg_aux = rd->tamanhoRegistro;
+			//printf("|ANTES| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//printf("ACHEI O SAL Q QUERO ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			atualiza_UmRegistro(rd, nomeCampoAtualiza, valorCampoAtualiza);
+			//printf("DEPOIS DE ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			//printf("|DEPOIS| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
+			
+			if(tam_reg_aux >= rd->tamanhoRegistro){ //se o tamanho antigo do registro for maior ou igual, então o registro atualizado permanece ali
+			//	printf("Atualizando sem remover e inserir\n");
+				insere_umReg_naPos(bin, rd, pos);
+			}
+			//long int ultimo_reg = 0;
+			else{
+			//	printf("Atualizando COM inserção e remoção!\n");
+				//senão o registro é removido e inserido em outro lugar
+				remove_registro_generico(bin, tam_reg_aux);
+				achaFirstFit_eInsereReg(bin, rd, ultimo_reg);				
+			}
 
 			//teste
 			//printf("\n\t### Testando Registro depois de modificado ###\n");
 			//volta_le_Eprinta_umRegistro(bin, rd->tamanhoRegistro);
+			
+			fseek(bin, pos_prox, SEEK_SET);
 		}
 		free(rd);
 	}
@@ -928,38 +1070,48 @@ void atualiza_salario (FILE* bin, int tam_bin, double sal, int *achei){
  				tam_pag: ponteiro para controlar o tamanho da pagina
  				achei: variavel que indica se encontrei registros ou não
 */
-void atualiza_telefone (FILE* bin, int tam_bin, char* tel, int *achei){
+void atualiza_telefone (FILE* bin, int tam_bin, char* tel, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg){
+	//printf("Quero atualizar o telefone |%s|\n", tel);
 	int lixo = 0;
-//	char removido = '*';
-//	long int encadeamento = -1;
-//	char arroba = '@';
 	REGDADOS* rd;
-	//printf("Quero remover o telefone |%s|\n", tel);
+	long int pos = 0;
+	long int pos_prox = 0;
 
-	//rewind(bin);
 
 	while(ftell(bin) != tam_bin){
 		
 		rd = calloc(1, sizeof(REGDADOS));
+		pos = ftell(bin);
 		leUmRegistroBin(bin, rd, &lixo);
+		pos_prox = ftell(bin);
 		if(strcmp(rd->telefoneServidor,tel) == 0){
-			//====removendo registro====
-			//printf("tam reg eh %d\n", rd->tamanhoRegistro);
-		//	printf("ACHEI O TEL Q QUERO REMOVER:\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
-			/*fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
-			fwrite(&removido, REM_TAM, 1, bin); //reescrevendo o valor de removido para '*', indicando que o registro foi removido
-			fseek(bin, TAM_TAM, SEEK_CUR); //pulando o tamanhoRegistro
-			fwrite(&encadeamento, ENC_TAM, 1, bin); //reescrevendo o valor de EncadeamentoLista com o novo valor
-			for(int i = 0; i < rd->tamanhoRegistro - ENC_TAM; i++){
-				fwrite(&arroba, sizeof(char), 1, bin); //completando o registro com lixo
-			} //completando o registro com lixo
-			*///==========================
-			remove_registro_generico(bin, rd->tamanhoRegistro);
 			(*achei) = 1;
+			//====atualizando registro====
+			int tam_reg_aux = rd->tamanhoRegistro;
+			//printf("|ANTES| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//printf("ACHEI O TEL Q QUERO ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			atualiza_UmRegistro(rd, nomeCampoAtualiza, valorCampoAtualiza);
+			//printf("DEPOIS DE ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			//printf("|DEPOIS| tam do reg eh %d\n", rd->tamanhoRegistro);
+		//	fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
+			
+			if(tam_reg_aux >= rd->tamanhoRegistro){ //se o tamanho antigo do registro for maior ou igual, então o registro atualizado permanece ali
+				//printf("Atualizando sem remover e inserir\n");
+				insere_umReg_naPos(bin, rd, pos);
+			}
+			//long int ultimo_reg = 0;
+			else{
+				//printf("Atualizando COM inserção e remoção!\n");
+				//senão o registro é removido e inserido em outro lugar
+				remove_registro_generico(bin, tam_reg_aux);
+				achaFirstFit_eInsereReg(bin, rd, ultimo_reg);
+			}
 
 			//teste
 			//printf("\n\t### Testando Registro depois de modificado ###\n");
 			//volta_le_Eprinta_umRegistro(bin, rd->tamanhoRegistro);
+
+			fseek(bin, pos_prox, SEEK_SET);
 		}
 		free(rd);
 	}
@@ -977,38 +1129,47 @@ void atualiza_telefone (FILE* bin, int tam_bin, char* tel, int *achei){
  				tam_pag: ponteiro para controlar o tamanho da pagina
  				achei: variavel que indica se encontrei registros ou não
 */
-void atualiza_nome (FILE* bin, int tam_bin, char* nome, int *achei){
+void atualiza_nome (FILE* bin, int tam_bin, char* nome, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg){
+	//printf("Quero atualizar o nome |%s|\n", nome);
 	int lixo = 0;
-	//char removido = '*';
-	//long int encadeamento = -1;
-	//char arroba = '@';
 	REGDADOS* rd;
-	//printf("Quero remover o nome |%s|\n", nome);
-
-	//rewind(bin);
+	long int pos = 0;
+	long int pos_prox = 0;
 
 	while(ftell(bin) != tam_bin){
 		
 		rd = calloc(1, sizeof(REGDADOS));
+		pos = ftell(bin);
 		leUmRegistroBin(bin, rd, &lixo);
+		pos_prox = ftell(bin);
 		if(strcmp(rd->nomeServidor, nome) == 0){
-			//====removendo registro====
-			//printf("tam reg eh %d\n", rd->tamanhoRegistro);
-		//	printf("ACHEI O NOME Q QUERO REMOVER:\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
-			/*fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
-			fwrite(&removido, REM_TAM, 1, bin); //reescrevendo o valor de removido para '*', indicando que o registro foi removido
-			fseek(bin, TAM_TAM, SEEK_CUR); //pulando o tamanhoRegistro
-			fwrite(&encadeamento, ENC_TAM, 1, bin); //reescrevendo o valor de EncadeamentoLista com o novo valor
-			for(int i = 0; i < rd->tamanhoRegistro - ENC_TAM; i++){
-				fwrite(&arroba, sizeof(char), 1, bin); //completando o registro com lixo
-			} //completando o registro com lixo
-			*///==========================
-			remove_registro_generico(bin, rd->tamanhoRegistro);
 			(*achei) = 1;
+			//====atualizando registro====
+			int tam_reg_aux = rd->tamanhoRegistro;
+			//printf("|ANTES| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//printf("ACHEI O NOME Q QUERO ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			atualiza_UmRegistro(rd, nomeCampoAtualiza, valorCampoAtualiza);
+			//printf("DEPOIS DE ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			//printf("|DEPOIS| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
+			
+			if(tam_reg_aux >= rd->tamanhoRegistro){ //se o tamanho antigo do registro for maior ou igual, então o registro atualizado permanece ali
+				//printf("Atualizando sem remover e inserir\n");
+				insere_umReg_naPos(bin, rd, pos);
+			}
+			//long int ultimo_reg = 0;
+			else{
+				//printf("Atualizando COM inserção e remoção!\n");
+				//senão o registro é removido e inserido em outro lugar
+				remove_registro_generico(bin, tam_reg_aux);
+				achaFirstFit_eInsereReg(bin, rd, ultimo_reg);				
+			}
 
 			//teste
 			//printf("\n\t### Testando Registro depois de modificado ###\n");
 			//volta_le_Eprinta_umRegistro(bin, rd->tamanhoRegistro);
+			fseek(bin, pos_prox, SEEK_SET);
+
 		}
 		free(rd);
 	}
@@ -1026,38 +1187,46 @@ void atualiza_nome (FILE* bin, int tam_bin, char* nome, int *achei){
  				tam_pag: ponteiro para controlar o tamanho da pagina
  				achei: variavel que indica se encontrei registros ou não
 */
-void atualiza_cargo (FILE* bin, int tam_bin, char* cargo, int *achei){
+void atualiza_cargo (FILE* bin, int tam_bin, char* cargo, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg){
+	//printf("Quero atualizar o cargo |%s|\n", cargo);
 	int lixo = 0;
-	/*char removido = '*';
-	long int encadeamento = -1;
-	char arroba = '@';
-	*/REGDADOS* rd;
-	//printf("Quero remover o cargo |%s|\n", cargo);
-
-	//rewind(bin);
+	REGDADOS* rd;
+	long int pos = 0;
+	long int pos_prox = 0;
 
 	while(ftell(bin) != tam_bin){
 		
 		rd = calloc(1, sizeof(REGDADOS));
+		pos = ftell(bin);
 		leUmRegistroBin(bin, rd, &lixo);
+		pos_prox = ftell(bin);
 		if(strcmp(rd->cargoServidor, cargo) == 0){
-			//====removendo registro====
-			//printf("tam reg eh %d\n", rd->tamanhoRegistro);
-		//	printf("ACHEI O CARGO Q QUERO REMOVER:\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
-		/*	fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
-			fwrite(&removido, REM_TAM, 1, bin); //reescrevendo o valor de removido para '*', indicando que o registro foi removido
-			fseek(bin, TAM_TAM, SEEK_CUR); //pulando o tamanhoRegistro
-			fwrite(&encadeamento, ENC_TAM, 1, bin); //reescrevendo o valor de EncadeamentoLista com o novo valor
-			for(int i = 0; i < rd->tamanhoRegistro - ENC_TAM; i++){
-				fwrite(&arroba, sizeof(char), 1, bin); //completando o registro com lixo
-			}
-		*/	//==========================
-			remove_registro_generico(bin, rd->tamanhoRegistro);
 			(*achei) = 1;
+			//====atualizando registro====
+			int tam_reg_aux = rd->tamanhoRegistro;
+			//printf("|ANTES| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//printf("ACHEI O TEL Q QUERO ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			atualiza_UmRegistro(rd, nomeCampoAtualiza, valorCampoAtualiza);
+			//printf("DEPOIS DE ATUALIZAR!\nRemovido: %c\nID: %d\nSalario: %lf\nTel: %s\nNome: %s\nCargo: %s\n", rd->removido, rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
+			//printf("|DEPOIS| tam do reg eh %d\n", rd->tamanhoRegistro);
+			//fseek(bin, -(rd->tamanhoRegistro + TAM_TAM + REM_TAM), SEEK_CUR); //voltando no inicio do registro
+			
+			if(tam_reg_aux >= rd->tamanhoRegistro){ //se o tamanho antigo do registro for maior ou igual, então o registro atualizado permanece ali
+				//printf("Atualizando sem remover e inserir\n");
+				insere_umReg_naPos(bin, rd, pos);
+			}
+			//long int ultimo_reg = 0;
+			else{
+			//	printf("Atualizando COM inserção e remoção!\n");
+				//senão o registro é removido e inserido em outro lugar
+				remove_registro_generico(bin, tam_reg_aux);
+				achaFirstFit_eInsereReg(bin, rd, ultimo_reg);				
+			}
 
 			//teste
 			//printf("\n\t### Testando Registro depois de modificado ###\n");
 			//volta_le_Eprinta_umRegistro(bin, rd->tamanhoRegistro);
+			fseek(bin, pos_prox, SEEK_SET);
 		}
 		free(rd);
 	}

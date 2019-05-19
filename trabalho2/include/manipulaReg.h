@@ -43,6 +43,12 @@
 	//long int achaFirstFit(FILE* bin, int tam_reg, int tam_bin, int*tam_reg_noBin);
 
 	//================ ATUALIZAÇÃO ===================
-	long int busca_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX]);
+	void busca_atualiza_campo(char* nomeBin, char nomeCampo[MAX], char valor[MAX], char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg);
+	void atualiza_UmRegistro(REGDADOS* rd, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX]);
+	void atualiza_id (FILE* bin, int tam_bin, int id, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg);
+	void atualiza_salario (FILE* bin, int tam_bin, double sal, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg);
+	void atualiza_telefone (FILE* bin, int tam_bin, char* tel, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg);
+	void atualiza_nome (FILE* bin, int tam_bin, char* nome, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg);
+	void atualiza_cargo (FILE* bin, int tam_bin, char* cargo, int *achei, char nomeCampoAtualiza[MAX], char valorCampoAtualiza[MAX], long int* ultimo_reg);
 
 #endif

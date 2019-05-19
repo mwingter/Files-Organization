@@ -156,32 +156,7 @@ void insere_registro(){
 		scan_quote_string(nome);
 		scan_quote_string(cargo);
 		//printf("id|%s|, sal|%s|, tel|%s|, nome|%s|, cargo|%s|\n", idStr, salStr, tel, nome, cargo);
-/*		if(strcmp(idStr, "NULO") == 0){
-			id = -1;
-		}
-		else{
-			id = atoi(idStr);
-		}
-		if(strcmp(salStr, "NULO") == 0){
-			sal = -1;
-		}
-		else{
-			sal = atof(salStr);
-		}
-		if(tel[0] != '('){
-			tel[0] = '\0';
-			for(int i = 1; i < 14; i++){
-				tel[i] = '@';
-			}
-		}
-		if(nome[0] != '\0'){
-			nome[strlen(nome)] = '\0';
-		}
 
-		if(cargo[0] != '\0'){
-			cargo[strlen(cargo)] = '\0';
-		}
-*/
 		rd = calloc(1, sizeof(REGDADOS));
 		//criaNovoRegDados(rd, id, sal, tel, nome, cargo);
 		criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
@@ -200,22 +175,35 @@ void insere_registro(){
 void atualiza_registro(){
 	char nomeBin[MAX];
 	int n; //n = numero de vezes que a funcionalidade 4 será executada
+	long int ultimo_reg = -1;
 	scanf(" %s %d", nomeBin, &n);
 
 	char nomeCampoBusca[MAX]; char valorCampoBusca[MAX];
 	char nomeCampoAtualiza[MAX]; char valorCampoAtualiza[MAX];
 
 	for (int i = 0; i < n; ++i){
-		scan_quote_string(nomeCampoBusca);
-		scan_quote_string(valorCampoBusca);
-		scan_quote_string(nomeCampoAtualiza);
-		scan_quote_string(valorCampoAtualiza);
-		if(strcmp(nomeCampoBusca, nomeCampoAtualiza) != 0 && strcmp(valorCampoBusca, valorCampoAtualiza) != 0){ //verifica se os campos são o mesmo, se for não faz nada
-			//busca_campo(nomeBin, nomeCampoBusca, valorCampoBusca);
+		scanf("%s", nomeCampoBusca);
+		if(strcmp(nomeCampoBusca, "idServidor") == 0 || strcmp(nomeCampoBusca, "salarioServidor") == 0){
+			scanf("%s", valorCampoBusca);
+		}
+		else{
+			scan_quote_string(valorCampoBusca);
+		}
+		scanf("%s", nomeCampoAtualiza);
+		if(strcmp(nomeCampoAtualiza, "idServidor") == 0 || strcmp(nomeCampoAtualiza, "salarioServidor") == 0){
+			scanf("%s", valorCampoAtualiza);
+		}
+		else{
+			scan_quote_string(valorCampoAtualiza);
 		}
 
-
+		if(strcmp(nomeCampoBusca, nomeCampoAtualiza) != 0 && strcmp(valorCampoBusca, valorCampoAtualiza) != 0){ //verifica se os campos são o mesmo, se for não faz nada
+			//printf("\n====Quero atualizar:\n\tDe:\tCampo: %s, Valor: %s\n\tPara:\tCampo: %s, Novo Valor: %s====\n\n", nomeCampoBusca, valorCampoBusca, nomeCampoAtualiza, valorCampoAtualiza);
+			busca_atualiza_campo(nomeBin, nomeCampoBusca, valorCampoBusca, nomeCampoAtualiza, valorCampoAtualiza, &ultimo_reg);
+		}
 	}
+
+	binarioNaTela2(nomeBin);
 }
 
 void menu()

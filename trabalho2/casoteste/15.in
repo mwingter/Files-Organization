@@ -1,4 +1,4 @@
-4 binario-16.bin 7500
+4 binario-16.bin 7458
 idServidor 8709360
 salarioServidor 6668.200000
 idServidor 2011594
@@ -36,7 +36,6 @@ idServidor 7710248
 idServidor 4117714
 telefoneServidor "(40)99751-4582"
 idServidor 8900865
-salarioServidor NULO
 telefoneServidor "(34)99787-4498"
 idServidor 7808504
 idServidor 7211709
@@ -270,7 +269,6 @@ salarioServidor 0.000000
 idServidor 4104093
 idServidor 2408354
 nomeServidor "CLAUDIA DE MELLO BERTONCHELI DOS SANTOS"
-salarioServidor NULO
 salarioServidor 29127.870000
 idServidor 6312460
 nomeServidor "IZABEL GIOVELI"
@@ -472,8 +470,6 @@ telefoneServidor "(83)99695-4831"
 idServidor 2315158
 idServidor 7015538
 idServidor 7409910
-salarioServidor NULO
-salarioServidor NULO
 telefoneServidor NULO
 telefoneServidor NULO
 idServidor 2211900
@@ -631,7 +627,6 @@ idServidor 9518074
 idServidor 5411326
 idServidor 5612030
 telefoneServidor "(20)98276-3042"
-salarioServidor NULO
 nomeServidor "ALEXANDRE DE FRANCA FAVERO"
 nomeServidor "OHARA KERUSAUSKAS RAYEL"
 telefoneServidor "(93)99379-1876"
@@ -1080,7 +1075,6 @@ idServidor 4409747
 idServidor 2211187
 idServidor 2403419
 idServidor 6303112
-salarioServidor NULO
 cargoServidor "ASSISTENTE-A"
 nomeServidor "EVELINE MARIA PONTE FREIRE"
 idServidor 3608653
@@ -1102,7 +1096,6 @@ idServidor 5000013
 idServidor 6713094
 idServidor 3717855
 idServidor 1313239
-salarioServidor NULO
 idServidor 907918
 idServidor 9515295
 cargoServidor NULO
@@ -1450,7 +1443,6 @@ idServidor 7704444
 cargoServidor NULO
 telefoneServidor "(40)99974-8012"
 idServidor 7318258
-salarioServidor NULO
 nomeServidor "EVANGELISTA LAURENTINO DA SILVA"
 idServidor 6005081
 idServidor 3109286
@@ -2003,7 +1995,6 @@ idServidor 1609601
 idServidor 2010159
 idServidor 1217214
 idServidor 4704977
-salarioServidor NULO
 salarioServidor 0.000000
 idServidor 7303341
 salarioServidor 9627.420000
@@ -2060,7 +2051,6 @@ idServidor 3015180
 idServidor 7500961
 idServidor 7013496
 telefoneServidor NULO
-salarioServidor NULO
 idServidor 6403655
 idServidor 4407391
 idServidor 8710500
@@ -2193,7 +2183,6 @@ idServidor 7314635
 idServidor 4905668
 cargoServidor NULO
 nomeServidor "MARIA ALICE FERNANDES DE PAIVA"
-salarioServidor NULO
 salarioServidor 12893.120000
 idServidor 4215187
 idServidor 7614624
@@ -2499,7 +2488,6 @@ idServidor 1017997
 cargoServidor "PROFESSOR DO MAGISTERIO SUPERIOR"
 idServidor 8508396
 telefoneServidor "(19)98258-5316"
-salarioServidor NULO
 idServidor 6509262
 idServidor 6005039
 cargoServidor "TECNICO DO SEGURO SOCIAL"
@@ -2898,7 +2886,6 @@ idServidor 23646010
 idServidor 1404599
 idServidor 3811717
 idServidor 715992
-salarioServidor NULO
 idServidor 6811813
 idServidor 38290450
 idServidor 8605591
@@ -2957,7 +2944,6 @@ cargoServidor "AUX OPERAC SERVICOS DIVERSOS"
 idServidor 1615448
 idServidor 2414259
 nomeServidor "THALITA DE OLIVEIRA GONCALVES DOS SANTOS"
-salarioServidor NULO
 idServidor 1717480
 idServidor 1503398
 salarioServidor 6640.830000
@@ -2993,7 +2979,6 @@ salarioServidor 4750.250000
 idServidor 8502377
 nomeServidor "ALEXANDRE OLIVETO CORREA"
 idServidor 6413645
-salarioServidor NULO
 idServidor 3702934
 cargoServidor "AUX EM ADMINISTRACAO"
 telefoneServidor "(15)98257-8015"
@@ -3062,7 +3047,6 @@ idServidor 6700732
 salarioServidor 0.000000
 idServidor 17465
 idServidor 7906960
-salarioServidor NULO
 idServidor 116968
 idServidor 7002878
 idServidor 2805418
@@ -3100,7 +3084,6 @@ idServidor 6708736
 idServidor 4706960
 idServidor 3201366
 idServidor 4118191
-salarioServidor NULO
 salarioServidor 5726.830000
 idServidor 5303991
 idServidor 1912052
@@ -3762,7 +3745,6 @@ nomeServidor "LUZIA DE SOUSA ROCHA"
 idServidor 4616854
 idServidor 2902040
 salarioServidor 18390.140000
-salarioServidor NULO
 idServidor 8608983
 idServidor 4408107
 idServidor 710815
@@ -3864,7 +3846,6 @@ idServidor 2602060
 idServidor 5602450
 idServidor 5611037
 idServidor 28893663
-salarioServidor NULO
 idServidor 1906019
 idServidor 3710509
 salarioServidor 18343.470000
@@ -4005,7 +3986,6 @@ telefoneServidor NULO
 idServidor 7608099
 idServidor 4912780
 nomeServidor "DEJAIR GONCALVES CAMPOS"
-salarioServidor NULO
 salarioServidor 5288.050000
 idServidor 601703
 idServidor 3402712
@@ -4015,7 +3995,6 @@ idServidor 2214542
 cargoServidor NULO
 telefoneServidor "(14)98906-5777"
 idServidor 4303039
-salarioServidor NULO
 salarioServidor 13153.810000
 nomeServidor "GILMARA CRUZ E SILVA LACERDA"
 idServidor 10711
@@ -4421,7 +4400,6 @@ idServidor 5214603
 idServidor 4417580
 idServidor 2708322
 salarioServidor 5976.810000
-salarioServidor NULO
 idServidor 5018559
 idServidor 8916407
 nomeServidor "RENATA NASCIMENTO DUARTE FIGUEIREDO"
@@ -4512,8 +4490,6 @@ cargoServidor NULO
 idServidor 9309801
 idServidor 1215213
 salarioServidor 5485.230000
-salarioServidor NULO
-salarioServidor NULO
 idServidor 8814314
 idServidor 3301930
 idServidor 3014949
@@ -4536,7 +4512,6 @@ nomeServidor "LARISSA MARTINS DE LIMA"
 idServidor 4005424
 idServidor 1911633
 cargoServidor "ENFERMEIRO - 36H"
-salarioServidor NULO
 cargoServidor "ARTIFICE"
 idServidor 8905192
 telefoneServidor NULO
@@ -4588,7 +4563,6 @@ idServidor 4216141
 salarioServidor 7916.260000
 telefoneServidor "(62)99352-6267"
 idServidor 717461
-salarioServidor NULO
 telefoneServidor "(75)99437-8566"
 nomeServidor "TELMA OLIVEIRA MEDEIROS"
 cargoServidor "PROFESSOR DO MAGISTERIO SUPERIOR"
@@ -5195,7 +5169,6 @@ telefoneServidor "(85)99777-1281"
 cargoServidor "PROCURADOR FEDERAL"
 idServidor 9205150
 salarioServidor 25745.610000
-salarioServidor NULO
 salarioServidor 15874.330000
 telefoneServidor NULO
 nomeServidor "DIDIMO LINDUGERO BANDEIRA"
@@ -5333,7 +5306,6 @@ salarioServidor 4272.990000
 idServidor 5413085
 idServidor 3310300
 cargoServidor "MOTORISTA OFICIAL"
-salarioServidor NULO
 idServidor 5317567
 idServidor 1104236
 salarioServidor 5600.250000
@@ -5393,7 +5365,6 @@ telefoneServidor "(21)98572-3165"
 idServidor 46440595
 cargoServidor "PROFESSOR ENS BASICO TECN TECNOLOGICO"
 idServidor 3106396
-salarioServidor NULO
 idServidor 5512161
 telefoneServidor NULO
 nomeServidor "FABIANA VIEIRA BRAND"
@@ -5418,7 +5389,6 @@ idServidor 3702059
 cargoServidor "ANALISTA TRIBUTARIO REC FEDERAL BRASIL"
 idServidor 3115535
 salarioServidor 26127.940000
-salarioServidor NULO
 nomeServidor "GLAUCIA NONATO PORTO"
 idServidor 1502439
 salarioServidor 6937.710000
@@ -5561,7 +5531,6 @@ idServidor 43044109
 idServidor 6515276
 idServidor 1816484
 idServidor 2309695
-salarioServidor NULO
 telefoneServidor NULO
 salarioServidor 4272.990000
 idServidor 204860
@@ -5833,7 +5802,6 @@ idServidor 4811131
 nomeServidor "SIDNEY MACHADO SILVA"
 idServidor 808576
 nomeServidor "JOSE ROBERTO LEOPOLDINO"
-salarioServidor NULO
 telefoneServidor "(61)99757-4047"
 cargoServidor "CONTADOR"
 idServidor 1407922
@@ -5844,7 +5812,6 @@ idServidor 1712408
 idServidor 5904116
 idServidor 8414637
 idServidor 4312664
-salarioServidor NULO
 idServidor 1910097
 idServidor 1209476
 idServidor 2909577
@@ -5921,7 +5888,6 @@ idServidor 4202541
 salarioServidor 5262.210000
 idServidor 3703013
 idServidor 7208336
-salarioServidor NULO
 telefoneServidor "(77)98225-7870"
 nomeServidor "KERLON DOS SANTOS EVANGELISTA"
 idServidor 1608963
@@ -5967,7 +5933,6 @@ salarioServidor 0.000000
 nomeServidor "EDILSON ALLEF SILVA DE OLIVEIRA"
 nomeServidor "RITA DE CASSIA FRANZE DOS SANTOS"
 telefoneServidor "(82)99715-8355"
-salarioServidor NULO
 cargoServidor "PROFESSOR MAGISTERIO SUPERIOR-SUBSTITUTO"
 nomeServidor "RICARDO MARQUES ALVES PEREIRA"
 idServidor 3900594
@@ -6047,7 +6012,6 @@ nomeServidor "DULCELENA FERREIRA SILVA"
 idServidor 2118325
 idServidor 7118042
 idServidor 5301682
-salarioServidor NULO
 cargoServidor "TECNICO DE LABORATORIO AREA"
 salarioServidor 9385.310000
 idServidor 400601
@@ -6134,7 +6098,6 @@ idServidor 7803627
 idServidor 1705322
 nomeServidor "MARTHA LUCIA CARNEIRO BARBOSA LEAL"
 nomeServidor "EDSON LUIZ REGINALDO"
-salarioServidor NULO
 idServidor 5214949
 nomeServidor "SABRINNY RAKEL SILVA DE LIMA"
 salarioServidor 14962.960000
@@ -6296,7 +6259,6 @@ idServidor 7806116
 idServidor 3000026
 cargoServidor "TECNICO DO SEGURO SOCIAL"
 idServidor 6015862
-salarioServidor NULO
 idServidor 2916217
 idServidor 701336
 idServidor 8705525
@@ -6346,7 +6308,6 @@ nomeServidor "MANOEL LUIZ DUQUE ESTRADA"
 idServidor 1716602
 idServidor 2206964
 telefoneServidor NULO
-salarioServidor NULO
 idServidor 7814767
 cargoServidor "TECNICO EM ASSUNTOS EDUCACIONAIS"
 idServidor 5303786
@@ -6539,7 +6500,6 @@ salarioServidor 17051.950000
 idServidor 3609877
 idServidor 7215369
 idServidor 1510019
-salarioServidor NULO
 idServidor 3803256
 idServidor 6515484
 telefoneServidor "(79)99342-3464"
@@ -6615,7 +6575,6 @@ telefoneServidor "(77)99273-3895"
 salarioServidor 4475.990000
 idServidor 1813577
 idServidor 4009967
-salarioServidor NULO
 idServidor 5209494
 idServidor 2209556
 telefoneServidor NULO
@@ -6723,7 +6682,6 @@ nomeServidor "MARIA APARECIDA DANTAS DE ARAUJO"
 salarioServidor 11284.160000
 idServidor 2813973
 idServidor 917550
-salarioServidor NULO
 telefoneServidor "(32)99207-8195"
 idServidor 4812957
 telefoneServidor "(60)98348-8945"

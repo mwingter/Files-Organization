@@ -37,6 +37,7 @@
 
 	void structToBin(int* tamPagina, int *tamRegAnterior, REGDADOS* r, REGCAB* c, FILE* bin);
 	void lePrintaArqBin(char nome[MAX]);
+	int le_ePrinta_UmRegistro(FILE *bin, REGDADOS* t, int *tam_pag);
 	void salvaRegistroNaStruct(FILE* f, REGDADOS* r);
 	int tamArquivo(FILE *arq);
 	void buscaRegBin(FILE* bin, REGCAB* rc, char nomeCampo[MAX], char valor[MAX]);
