@@ -120,7 +120,7 @@ void structToBin(int* tamPagina, int *tamRegAnterior, REGDADOS* r, REGCAB* c, FI
 
 /*
  * lePrintaArqBin
- * Função: Abre um arquivo binário e printa na tela os registros presentes
+ * Função: Abre um arquivo binário e printa na tela todos os registros deste.
  * Parâmetros: 	
  				nome: Nome do arquivo binário a ser aberto
 */
@@ -139,8 +139,6 @@ void lePrintaArqBin(char nome[MAX]){
 		printf("Falha no processamento do arquivo.\n");
 		return;
 	}
-	//char tag;
-	//int tam;
 
 	char status = fgetc(bin);
 
@@ -153,108 +151,12 @@ void lePrintaArqBin(char nome[MAX]){
 
 	while(ftell(bin) < tam_bin)
 	{
-		//t->tamanhoRegistro = 0;
 		if(ftell(bin) == tam_bin){
 			break;
 		}
 		t = calloc (1, sizeof(REGDADOS));
 		achei = le_ePrinta_UmRegistro(bin, t, &tamanhoPagina);
-		/*fread(&t->removido,REM_TAM,1,bin);
-			
-		if(t->removido == '-'){
-			//coletando os dados do arquivo binário e salvando na struct
-			fread(&t->tamanhoRegistro,TAM_TAM,1,bin); 
-			tamanhoPagina += (t->tamanhoRegistro+5);
-			tam_reg_restante = t->tamanhoRegistro;
 
-			fread(&t->encadeamentoLista,ENC_TAM,1,bin);
-			//t->tamanhoRegistro -= ENC_TAM;
-
-			fread(&t->idServidor,ID_TAM,1,bin); 
-			printf("%d", t->idServidor);
-			//t->tamanhoRegistro -= ID_TAM;
-
-			fread(&t->salarioServidor,SAL_TAM,1,bin); 
-			if(t->salarioServidor != -1){
-				printf(" %.2lf", t->salarioServidor);
-			}
-			else{
-				printf("         ");
-			}
-			//t->tamanhoRegistro -= SAL_TAM;
-
-			fread(&t->telefoneServidor,14,1,bin); 
-			if(t->telefoneServidor[0] == '\0'){			
-				sprintf(t->telefoneServidor, "%s", "              ");		
-			}
-			printf(" %s", t->telefoneServidor);
-
-			//t->tamanhoRegistro -= 14;
-			tam_reg_restante -= (ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM);
-
-			 //se o registro ainda tem mais dados, continuar
-			fread(&tam,TAM_TAM,1,bin); // lendo o tamanho da proxima string, q pode ser nome ou campo
-
-			fread(&tag,TAG_TAM,1,bin); // lendo a tag da proxima string, q pode ser nome ou campo
-			
-			//verificando se o campo será de nome ou campo
-			if(tag == 'n' ){ //se for n é pq tem nome
-				t->tamNomeServidor = tam; //entao o tamanho que li é do nome mesmo
-				fread(&t->nomeServidor,(t->tamNomeServidor - 1),1,bin); //lendo o nome
-				//t->tamanhoRegistro -= (t->tamNomeServidor);
-				//t->tamanhoRegistro -= TAM_TAM;
-				tam_reg_restante -= (t->tamNomeServidor + TAM_TAM);
-
-				printf(" %d %s", t->tamNomeServidor-2, t->nomeServidor);
-
-			}else if (tag == 'c'){ //se for c é pq nao tem nome, e o campo ja eh cargo
-				sprintf(t->nomeServidor, "%s", "");
-				
-				t->tamCargoServidor = tam; //entao o tamanho que li não era do nome pq não tem nome, mas sim do cargo
-
-				fread(&t->cargoServidor,(t->tamCargoServidor - 1),1,bin); // read 10 bytes to our buffer
-
-				//t->tamanhoRegistro -= (t->tamCargoServidor);
-				//t->tamanhoRegistro -= TAM_TAM;
-				tam_reg_restante -= (t->tamCargoServidor + TAM_TAM);
-
-				printf(" %d %s", t->tamCargoServidor-2, t->cargoServidor);
-
-
-			}
-			else{
-				fseek(bin, -(TAM_TAM+TAG_TAM), SEEK_CUR); // VOLTA TAG
-			}
-				
-			fread(&tam, TAM_TAM, 1, bin);
-
-			if(fread(&tag,TAG_TAM,1,bin)){
-
-				if (tag == 'c'){ 
-				//se for c é pq nao tem nome, e o campo ja eh cargo
-					t->tamCargoServidor = tam; //entao o tamanho que li não era do nome pq não tem nome, mas sim do cargo
-
-					fread(&t->cargoServidor,(t->tamCargoServidor - 1),1,bin); // read 10 bytes to our buffer
-
-					//t->tamanhoRegistro -= (t->tamCargoServidor);
-					//t->tamanhoRegistro -= TAM_TAM;
-					tam_reg_restante -= (t->tamCargoServidor + TAM_TAM);
-
-					printf(" %d %s", t->tamCargoServidor-2, t->cargoServidor);
-				}
-				else {
-					fseek(bin, -(TAM_TAM+TAG_TAM), SEEK_CUR);
-				}	
-			
-			//	if(t->tamanhoRegistro > 0){
-			//		char lixo;
-			//		for(int i = 0; i < t->tamanhoRegistro; i++){
-			//			fread(&lixo, 1, 1, bin);
-			//		}
-			//	}
-				fseek(bin, tam_reg_restante, SEEK_CUR);
-			}		
-		}*/
 		if(achei == 1){
 			printf("\n");
 		}
@@ -282,6 +184,14 @@ void lePrintaArqBin(char nome[MAX]){
 	fclose(bin);
 }
 
+/*
+ * le_ePrinta_UmRegistro
+ * Função: Lê um registro de um arquivo binário e printa na tela os dados deste.
+ * Parâmetros: 	
+ 				bin: Arquivo binário
+ 				rt: Registro de dados
+ 				tam_pag: ponteiro para controlar o tamanho da página
+*/
 int le_ePrinta_UmRegistro(FILE *bin, REGDADOS* t, int *tam_pag){
 	t->tamanhoRegistro = 0;
 	int tam = 0;
@@ -769,6 +679,17 @@ void printaRegEncontrado(REGCAB* rc, REGDADOS* rd) {
 	}
 }
 
+/*
+ * criaNovoRegDados
+ * Função: Recebe dados já no formato certo, e salva cria um registro de dados com eles
+ * Parâmetros: 	
+ 				rd: Registro de dados
+ 				id: idServidor do Registro de dados
+ 				sal: salarioServidor do Registro de dados
+ 				tel: telefoneServidor do Registro de dados
+ 				nome: nomeServidor do Registro de dados
+ 				cargo: CargoServidor do Registro de dados
+*/
 void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, char* cargo){
 	rd->idServidor = id;
 	rd->salarioServidor = sal;
@@ -783,6 +704,17 @@ void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, c
 	rd->encadeamentoLista = -1;
 }
 
+/*
+ * criaNovoRegDados2
+ * Função: Recebe dados no formato de string e os formata, e por fim cria um registro de dados com os dados formatados.
+ * Parâmetros: 	
+ 				rd: Registro de dados
+ 				id: idServidor do Registro de dados
+ 				sal: salarioServidor do Registro de dados
+ 				tel: telefoneServidor do Registro de dados
+ 				nome: nomeServidor do Registro de dados
+ 				cargo: CargoServidor do Registro de dados
+*/
 void criaNovoRegDados2(REGDADOS* rd, char* idStr, char* salStr, char* tel, char* nome, char* cargo){
 	int id; double sal;
 	rd->tamanhoRegistro = 0;

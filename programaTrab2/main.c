@@ -6,7 +6,9 @@
 #include "manipulaReg.h"
 
 /*
- * Funcionalidade 1
+ * Funcionalidade [1]: Permite a leitura de vários registros obtidos a partir de um arquivo de entrada
+(arquivo no formato CSV) e a gravação desses registros em um arquivo de dados de
+saída.
 */
 void leCsv_SalvaBin(){
 	char nomeDoArquivo[MAX];
@@ -56,7 +58,9 @@ void leCsv_SalvaBin(){
 	fclose(fp); fclose(arqBinario);
 }
 /*
- * Funcionalidade 2
+ * Funcionalidade [2]: Permite a recuperação dos dados, de todos os registros, armazenados no arquivo de
+dados, mostrando os dados de forma organizada na saída padrão para permitir a
+distinção dos campos e registros.
 */
 void leBin_PrintBin(){
 	char nomeDoArquivo[MAX];
@@ -66,7 +70,8 @@ void leBin_PrintBin(){
 
 }
 /*
- * Funcionalidade 3
+ * Funcionalidade [3]: Permite a recuperação dos dados de todos os registros que satisfaçam um critério
+de busca determinado pelo usuário.
 */
 void buscaBin_Print(){
 	char nomeBin[MAX], nomeCampo[MAX], valor[MAX];
@@ -97,7 +102,8 @@ void buscaBin_Print(){
 }
 
 /*
- * Funcionalidade 4
+ * Funcionalidade [4]: Permite a remoção lógica de registros, baseado na abordagem dinâmica de
+reaproveitamento de espaços de registros logicamente removidos.
 */
 void remove_registro(){
 	char nomeBin[MAX];
@@ -133,9 +139,8 @@ void remove_registro(){
 }
 
 /*
- * Funcionalidade 5
- valorIdServidor 1 valorSalarioServidor 1 valorTelefoneServidor 1
-valorNomeServidor 1 valorCargoServidor 1
+ * Funcionalidade [5]: Permite a inserção de registros adicionais, baseado na abordagem dinâmica de
+reaproveitamento de espaços de registros logicamente removidos.
 */
 void insere_registro(){
 	char nomeBin[MAX];
@@ -170,7 +175,8 @@ void insere_registro(){
 }
 
 /*
- * Funcionalidade 6
+ * Funcionalidade [6]: Permite a atualização de registros. Os registros a serem atualizados devem ser
+aqueles que satisfaçam um critério de busca determinado pelo usuário.
 */
 void atualiza_registro(){
 	char nomeBin[MAX];
@@ -208,28 +214,6 @@ void atualiza_registro(){
 
 void menu()
 {
-		/* FUNCIONALIDADES
-
-	[1] Permita a leitura de vários registros obtidos a partir de um arquivo de entrada
-(arquivo no formato CSV) e a gravação desses registros em um arquivo de dados de
-saída.
-	
-	[2] Permita a recuperação dos dados, de todos os registros, armazenados no arquivo de
-dados, mostrando os dados de forma organizada na saída padrão para permitir a
-distinção dos campos e registros.
-
-	[3] Permita a recuperação dos dados de todos os registros que satisfaçam um critério
-de busca determinado pelo usuário.
-
-	[4] Permita a remoção lógica de registros, baseado na abordagem dinâmica de
-reaproveitamento de espaços de registros logicamente removidos.
-
-	[5] Permita a inserção de registros adicionais, baseado na abordagem dinâmica de
-reaproveitamento de espaços de registros logicamente removidos.
-
-	[6] Permita a atualização de registros. Os registros a serem atualizados devem ser
-aqueles que satisfaçam um critério de busca determinado pelo usuário.
-*/
 	int op;
 	scanf("%d", &op);
 

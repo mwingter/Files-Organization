@@ -1,0 +1,32 @@
+removido - 1 - char
+
+tamanhoRegistro - 4 - int
+
+encadeamentoLista - 8 - long int
+
+idServidor - 4 - int
+
+salarioServidor - 8 - double
+
+telefoneServidor - 14 - string
+
+tamNome - 4 - int
+
+tagNome - 1 - char
+
+nome - variavel - string
+
+tamCargo - 4 - int
+
+tagCargo - 1 - char
+
+cargo - variavel - string
+
+
+
+
+
+cabeçalho
+status - 1 - char
+topoLista - 8 - long int 
+

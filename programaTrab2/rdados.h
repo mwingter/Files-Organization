@@ -35,20 +35,22 @@
 
 	};
 
+	void salvaRegistroNaStruct(FILE* f, REGDADOS* r);
 	void structToBin(int* tamPagina, int *tamRegAnterior, REGDADOS* r, REGCAB* c, FILE* bin);
 	void lePrintaArqBin(char nome[MAX]);
 	int le_ePrinta_UmRegistro(FILE *bin, REGDADOS* t, int *tam_pag);
-	void salvaRegistroNaStruct(FILE* f, REGDADOS* r);
 	int tamArquivo(FILE *arq);
+	
 	void buscaRegBin(FILE* bin, REGCAB* rc, char nomeCampo[MAX], char valor[MAX]);
 	void busca_id (FILE* bin, int tam_bin, int id, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
 	void busca_salario (FILE* bin, int tam_bin, double sal, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
 	void busca_telefone (FILE* bin, int tam_bin, char tel[TEL_TAM], int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
 	void busca_nome (FILE* bin, int tam_bin, char* nome, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
 	void busca_cargo (FILE* bin, int tam_bin, char* cargo, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
+	
+	void freadString(FILE* bin, char* str);
 	void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tamanhoPagina);
 	void printaRegEncontrado(REGCAB* rc, REGDADOS* rd);
-	void freadString(FILE* bin, char* str);
 	void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, char* cargo);
 	void criaNovoRegDados2(REGDADOS* rd, char* idStr, char* salStr, char* tel, char* nome, char* cargo);
 
