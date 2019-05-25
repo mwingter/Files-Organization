@@ -1,3 +1,11 @@
+/*
+	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+
+	Nome:	Michelle Wingter da Silva	nUSP:	10783243
+			Juliano Fantozzi					xxxxxxxx
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -1,3 +1,11 @@
+/*
+	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+
+	Nome:	Michelle Wingter da Silva	nUSP:	10783243
+			Juliano Fantozzi					xxxxxxxx
+
+*/
+
 #ifndef RDADOS_H
 
 	#define RDADOS_H
