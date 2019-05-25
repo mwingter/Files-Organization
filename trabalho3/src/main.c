@@ -1,9 +1,19 @@
+/*
+	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+
+	Nome:	Michelle Wingter da Silva	nUSP:	10783243
+			Juliano Fantozzi					xxxxxxxx
+
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "rdados.h"
 #include "manipulaReg.h"
+#include "organizaArq.h"
 
 /*
  * Funcionalidade [1]: Permite a leitura de vários registros obtidos a partir de um arquivo de entrada
@@ -212,6 +222,42 @@ void atualiza_registro(){
 	binarioNaTela2(nomeBin);
 }
 
+/*
+ * Funcionalidade [7] Realiza a ordenação interna dos dados de um arquivo de dados, considerando os
+valores do campo idServidor.
+*/
+void ordenacao_interna(){
+
+	char nomeBin_in[MAX]; /*nome do arquivo binário de entrada que segue as mesmas especificações do primeiro trabalho prático, 
+							e que contém dados desordenados e registros logicamente removidos.*/
+	
+	char nomeBin_out[MAX];/*nome do arquivo binário de saída que segue as mesmas especificações definidas no primeiro trabalho prático, e que contém dados 
+							ordenados de forma crescente nos valores do campo idServidor e não contém registros logicamente removidos.*/
+
+	scanf(" %s %s", nomeBin_in, nomeBin_out);
+
+	ordena_por_id(nomeBin_in, nomeBin_out);
+
+	binarioNaTela2(nomeBin_out);
+
+}
+
+/*
+ * Funcionalidade [8] Realiza a operação cosequencial de merging (união) de dois arquivos de dados,
+considerando os valores do campo idServidor.
+*/
+void merge_twoFiles(){
+
+}
+
+/*
+ * Funcionalidade [9] Realiza a operação cosequencial de matching (interesecção) de dois arquivos de
+dados, considerando os valores do campo idServidor.
+*/			
+void match_twoFiles(){
+
+}
+
 void menu()
 {
 	int op;
@@ -236,6 +282,15 @@ void menu()
 		case 6:
 			atualiza_registro();
 			break;
+		case 7:
+			ordenacao_interna();
+			break;
+		case 8:
+			merge_twoFiles();
+			break;
+		case 9:
+			match_twoFiles();
+
 		default:
 			printf("Opcao invalida.\n");
 	}
