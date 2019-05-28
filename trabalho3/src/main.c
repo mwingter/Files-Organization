@@ -2,7 +2,7 @@
 	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
 
 	Nome:	Michelle Wingter da Silva	nUSP:	10783243
-			Juliano Fantozzi					xxxxxxxx
+			Juliano Fantozzi					9791218
 
 */
 
@@ -121,31 +121,17 @@ void remove_registro(){
 	char nomeCampo[MAX];
 	char valorCampo[MAX];
 
-	//int n_rem = 0;
-	//REG_REM* listaRem = NULL;
-
 	scanf(" %s %d", nomeBin, &n);
 
-	//criando lista de removidos
-	//NO_REG_REM* lista_rem;
-
-	for (int i = 0; i < n; ++i)
-	{
-		//scanf("%s %s", nomeCampo, valorCampo);
+	for (int i = 0; i < n; ++i){
 		scanf("%s", nomeCampo);
 		scan_quote_string(valorCampo);
 		//printf("nome e valor|%s|%s|\n", nomeCampo, valorCampo);
-		//lista_rem = calloc(1, sizeof(NO_REG_REM));
 		busca_RemoveReg(nomeBin, nomeCampo, valorCampo);
 	}
-	//fclose(bin); 
 	
 	binarioNaTela2(nomeBin);
-	//printf("\nListar o arquivo binário %s.", nomeBin);
-
-
-	//free(lista_rem);
-	
+	//printf("\nListar o arquivo binário %s.", nomeBin);	
 }
 
 /*
@@ -158,13 +144,11 @@ void insere_registro(){
 	scanf(" %s %d", nomeBin, &n);
 
 	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
-	//int id; double sal;
 	REGDADOS *rd;
 
 	long int ultimo_reg = -1;
 
-	for (int i = 0; i < n; ++i)
-	{
+	for (int i = 0; i < n; ++i){
 		scanf("%s ", idStr);
 		scanf("%s ", salStr);
 		scan_quote_string(tel);
@@ -173,7 +157,6 @@ void insere_registro(){
 		//printf("id|%s|, sal|%s|, tel|%s|, nome|%s|, cargo|%s|\n", idStr, salStr, tel, nome, cargo);
 
 		rd = calloc(1, sizeof(REGDADOS));
-		//criaNovoRegDados(rd, id, sal, tel, nome, cargo);
 		criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
 //		printf("\n==========INSERINDO: \n\tid|%d|, sal|%lf|, tel|%s|, nome|%s|, cargo|%s|\n", rd->idServidor, rd->salarioServidor, rd->telefoneServidor, rd->nomeServidor, rd->cargoServidor);
 //		printf("TAMANHOS: \n\ttel = %ld\n\tnome = %d\n\tcargo = %d\n\t", strlen(tel), rd->tamNomeServidor, rd->tamCargoServidor);
