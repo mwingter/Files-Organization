@@ -17,6 +17,7 @@
 //============================= ORDENAÇÃO INTERNA ===========================
 	void ordena_por_id(char* nomeBin_in, char* nomeBin_out);
 	int int_compare_id(const void *A, const void *B);
+	int recalcula_tam_registro(REGDADOS *rd);
 
 //========================== MERGING DE DOIS ARQUIVOS ======================
 	void read_andMerge(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out);
