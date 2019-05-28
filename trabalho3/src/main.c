@@ -259,7 +259,7 @@ void merge_twoFiles(){
 
 	read_andMerge(nomeBin_in1, nomeBin_in2, nomeBin_out);
 
-	binarioNaTela2(nomeBin_out);
+	//binarioNaTela2(nomeBin_out);
 }
 
 /*
@@ -281,7 +281,7 @@ void match_twoFiles(){
 
 	read_andMatch(nomeBin_in1, nomeBin_in2, nomeBin_out);
 
-	binarioNaTela2(nomeBin_out);
+	//binarioNaTela2(nomeBin_out);
 
 }
 

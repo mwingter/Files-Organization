@@ -12,7 +12,9 @@
 
 #include "rcab.h"
 
-
+/*
+	Lê o cabeçalho de um arquivo csv, e salva na struct de cabeçalho rc
+*/
 void criaRegCabecalho(FILE* f, REGCAB* rc){
 	char ch;
 	int contaVirgula = 0;
@@ -86,7 +88,7 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 		}
 	}
 
-	//printf("\tREG CABEÇALHO: \n");
+	printf("\tREG CABEÇALHO: \n");
 	//printf("\t%.40s\n\t%.40s\n\t%.40s\n\t%.40s\n\t%.40s\n\n", rc->campos[0], rc->campos[1], rc->campos[2], rc->campos[3], rc->campos[4]);
 	
 	rc->tags[0] = 'i';
@@ -101,7 +103,7 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 	rc->topoLista = -1;
 
 	//status(1), topoLista(8), tag1(1), campo1(40), tag2(1), campo2(40),......., tag5(1), campo5(40) => totalBytes= 10+5+200 = 215
-	//printf("|%c|%lf|%c|%s|%c|%s|%c|%s|%c|%s|%c|%s|\n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3], rc->tags[4], rc->campos[4]);
+	printf("|%c|%ld|%c|%s|%c|%s|%c|%s|%c|%s|%c|%s|\n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3], rc->tags[4], rc->campos[4]);
 
 	free(c1);free(c2);free(c3);free(c4);free(c5);
 
@@ -149,6 +151,9 @@ void atualizaStatus(REGCAB* rc, FILE* bin){
 	fwrite(&rc->status, STATUS_TAM, 1, bin);
 }
 
+/*
+	Lê o cabeçalho de um arquivo binário e salva os dados na struct de cabeçalho rc
+*/
 void leCabecalho(FILE* bin, REGCAB *rc) {
 	//rc = calloc(1, sizeof(REGCAB));
 
@@ -159,7 +164,6 @@ void leCabecalho(FILE* bin, REGCAB *rc) {
 		return;
 	}
 
-	//lendo o cabeçalho e salvando na struct
 	fread(&rc->topoLista, TOPO_TAM, 1, bin);
 	for (int i = 0; i < 5; i++) {
 		fread(&rc->tags[i], TAG_TAM, 1, bin);
@@ -167,6 +171,8 @@ void leCabecalho(FILE* bin, REGCAB *rc) {
 	//	printf("NA FUNC LECABEÇALHO CAMPO = %s\n", rc->campos[i]);
 	}
 	//printf("TAMANHO %d, e %d", TAM_PAG_DISCO - CAB_TAM);
-	//avançando até a proxima página
+	
+
+	//printf("\nNa função leCabecalho\nstatus = %c, topoLista = %ld, tag[0] = %c, campo[0] = %s, tag[1] = %c, campo[1] = %s, tag[2] = %c, campo[2] = %s, tag[3] = %c, campo[3] = %s \n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3]);
 
 }
