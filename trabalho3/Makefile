@@ -5,9 +5,9 @@ NAME=programaTrab2
 # Directories
 INCDIR=include
 LIBDIR=lib
-BLDDIR=build
+BLDDIR=bin
 SRCDIR=src
-OBJDIR=$(SRCDIR)/obj
+OBJDIR=$(SRCDIR)
 
 # Can use any debbuger (like gdb) or overlay (like valgrind) (though gdb is an overlay too)
 DEBUGGER=
