@@ -156,7 +156,7 @@ void atualizaStatus(REGCAB* rc, FILE* bin){
 */
 void leCabecalho(FILE* bin, REGCAB *rc) {
 	//rc = calloc(1, sizeof(REGCAB));
-
+	
 	fread(&rc->status, STATUS_TAM, 1, bin);
 
 	if (rc->status == 0) {

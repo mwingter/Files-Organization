@@ -195,6 +195,101 @@ void read_andMatch(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 		fclose(bin_in2);
 		exit(0);
 	}
-	//========================================
+	//======== abrindo arquivo de saída ===========
+	FILE* bin_out = fopen(nomeBin_out, "wb");
 
+	int tam_bin_in1 = tamArquivo(bin_in1);
+	int tam_bin_in2 = tamArquivo(bin_in2);
+
+	//lendo o registro de cabeçalho e salvando numa struct
+	REGCAB* rc = calloc(1, sizeof(REGCAB));
+	REGCAB* rc2 = calloc(1, sizeof(REGCAB));
+	leCabecalho(bin_in1, rc);
+	leCabecalho(bin_in2, rc2);
+	
+	regCabToArqBin(rc, bin_out); //passando o registro de cabeçalho para o novo arquivo
+
+
+	//lendo os registros de dados e passando para o arquivo de saida os registros que existem nos dois arquivos de entrada (match)
+	fseek(bin_in1, TAM_PAG_DISCO, SEEK_SET); //pulando pra segunda pagina
+	fseek(bin_in2, TAM_PAG_DISCO, SEEK_SET); //pulando pra segunda pagina
+
+	REGDADOS* rd1 = NULL;
+	REGDADOS* rd2 = NULL;
+	//int n_reg = 0; //numero de registros na rd
+	int tam_pagina1 = 0;
+	int tam_pagina2 = 0;
+	//int tam_ult_registro1 = 0;
+	//int tam_ult_registro2 = 0;
+	//char removido = '@';
+	//int tam_reg_aux = 0;
+
+	int is_rd1_val;
+	int is_rd2_val;
+
+	int	tam_pagina_out = 32000;
+	int tamRegAnt = 0;
+
+	rd1 = calloc(1, sizeof(REGDADOS));
+	leUmRegistroBin(bin_in1, rd1, &tam_pagina1);
+
+	rd2 = calloc(1, sizeof(REGDADOS));
+	leUmRegistroBin(bin_in2, rd2, &tam_pagina2);
+	
+	//percorrendo o arquivo e montando a rd de structs de registros de dados
+	while((ftell(bin_in1) < tam_bin_in1) || (ftell(bin_in2) < tam_bin_in2)){
+		//printf("comparando %d com %d\n", rd1->idServidor, rd2->idServidor);
+
+		if(rd1->idServidor < rd2->idServidor){
+
+			free(rd1);
+			rd1 = calloc(1, sizeof(REGDADOS));
+			is_rd1_val = leUmRegistroBin(bin_in1, rd1, &tam_pagina1);
+		}
+		else if(rd1->idServidor > rd2->idServidor){
+			free(rd2);
+			rd2 = calloc(1, sizeof(REGDADOS));
+			is_rd2_val = leUmRegistroBin(bin_in2, rd2, &tam_pagina2);
+		}
+		else{ //if rd1 == rd2
+			if(rd1->removido == '*'){
+				continue;
+			}
+			//printf("deu match!\n");
+			rd1->tamanhoRegistro = recalcula_tam_registro(rd1);
+			structToBin(&tam_pagina_out, &tamRegAnt, rd1, rc, bin_out);
+			
+			free(rd2);
+			rd2 = calloc(1, sizeof(REGDADOS));
+			is_rd2_val = leUmRegistroBin(bin_in2, rd2, &tam_pagina2);
+			free(rd1);
+			rd1 = calloc(1, sizeof(REGDADOS));
+			is_rd1_val = leUmRegistroBin(bin_in1, rd1, &tam_pagina1);
+		}
+			
+	}
+	if(!is_rd1_val && !is_rd2_val){
+		if(rd1->idServidor == rd2->idServidor){
+			rd1->tamanhoRegistro = recalcula_tam_registro(rd1);
+			structToBin(&tam_pagina_out, &tamRegAnt, rd1, rc, bin_out);
+		}
+	}
+ 
+
+	fclose(bin_in1);fclose(bin_in2);fclose(bin_out);
+	free(rc); free(rc2);free(rd1); free(rd2);
+}
+
+
+void avancaProximo(REGDADOS *rd1, REGDADOS *rd2, FILE *bin_in1, FILE *bin_in2, int *tam_pagina1, int *tam_pagina2){
+	if(rd1->idServidor < rd2->idServidor){
+		free(rd1);
+		rd1 = calloc(1, sizeof(REGDADOS));
+		leUmRegistroBin(bin_in1, rd1, tam_pagina1);
+	}
+	else if(rd1->idServidor > rd2->idServidor){
+		free(rd2);
+		rd2 = calloc(1, sizeof(REGDADOS));
+		leUmRegistroBin(bin_in2, rd2, tam_pagina2);
+	}
 }

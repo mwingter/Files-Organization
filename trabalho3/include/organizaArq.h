@@ -25,5 +25,8 @@
 //========================== MATCHING DE DOIS ARQUIVOS ======================
 	void read_andMatch(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out);
 
+//========================== 
+	void avancaProximo(REGDADOS *rd1, REGDADOS *rd2, FILE *bin_in1, FILE *bin_in2, int *tam_pagina1, int *tam_pagina2);
+
 
 #endif

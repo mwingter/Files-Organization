@@ -559,7 +559,8 @@ void freadString(FILE* bin, char* str){
  				t: Registro de dados.
  				tam_pag: ponteiro para controlar o tamanho da pagina.
 */
-void leUmRegistroBin(FILE *bin, REGDADOS* t, int *tam_pag){
+int leUmRegistroBin(FILE *bin, REGDADOS* t, int *tam_pag){
+	if(feof(bin)) return 0;
 	t->tamanhoRegistro = 0;
 	int tam = 0;
 	char tag;
@@ -573,7 +574,7 @@ void leUmRegistroBin(FILE *bin, REGDADOS* t, int *tam_pag){
 	int tamanhoReg = t->tamanhoRegistro;
 	if(t->removido == '*'){
 		fseek(bin, t->tamanhoRegistro, SEEK_CUR);
-		return;
+		return 1;
 	}
 	(*tam_pag) += (t->tamanhoRegistro + TAM_TAM + REM_TAM);
 		
@@ -630,11 +631,12 @@ void leUmRegistroBin(FILE *bin, REGDADOS* t, int *tam_pag){
 		
 		lixo = getc(bin);
 		if (lixo == EOF){
-			return;
+			return 0;
 		}
 	}while(lixo != '-' && lixo != '*');
 
 	fseek(bin, -1, SEEK_CUR);
+	return 1;
 }
 
 

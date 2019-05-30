@@ -57,7 +57,7 @@
 	void busca_cargo (FILE* bin, int tam_bin, char* cargo, int *numPaginasAcessadas, int *tam_pag, REGCAB* rc, int *achei);
 	
 	void freadString(FILE* bin, char* str);
-	void leUmRegistroBin(FILE*bin, REGDADOS* t, int *tamanhoPagina);
+	int leUmRegistroBin(FILE*bin, REGDADOS* t, int *tamanhoPagina);
 	void printaRegEncontrado(REGCAB* rc, REGDADOS* rd);
 	void criaNovoRegDados(REGDADOS* rd, int id, double sal, char* tel, char* nome, char* cargo);
 	void criaNovoRegDados2(REGDADOS* rd, char* idStr, char* salStr, char* tel, char* nome, char* cargo);

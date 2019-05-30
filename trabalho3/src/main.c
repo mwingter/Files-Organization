@@ -281,7 +281,7 @@ void match_twoFiles(){
 
 	read_andMatch(nomeBin_in1, nomeBin_in2, nomeBin_out);
 
-	//binarioNaTela2(nomeBin_out);
+	binarioNaTela2(nomeBin_out);
 
 }
 
@@ -317,6 +317,7 @@ void menu()
 			break;
 		case 9:
 			match_twoFiles();
+			break;
 
 		default:
 			printf("Opcao invalida.\n");
