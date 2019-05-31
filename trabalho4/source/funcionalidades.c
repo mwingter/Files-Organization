@@ -1,6 +1,16 @@
+/*
+	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+
+	Nome:	Michelle Wingter da Silva	nUSP:	10783243
+			Juliano Fantozzi					9791218
+
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "funcionalidades.h"
 
 #include "rdados.h"
 #include "manipulaReg.h"
@@ -109,7 +119,6 @@ void remove_registro(){
 
 	scanf(" %s %d", nomeBin, &n);
 
-	//criando lista de removidos
 	for (int i = 0; i < n; ++i){
 		scanf("%s", nomeCampo);
 		scan_quote_string(valorCampo);
@@ -245,4 +254,106 @@ void match_twoFiles(){
 	read_andMatch(nomeBin_in1, nomeBin_in2, nomeBin_out);
 
 	binarioNaTela2(nomeBin_out);
+}
+
+/* Funcionalidade [10]: Cria um arquivo de índice secundário fortemente ligado para um arquivo de
+dados de entrada já existente. O campo a ser indexado é nomeServidor.*/
+void cria_arquivoIndice(){
+	char nomeBin_in[MAX];
+	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
+
+	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+
+	novoIndice(nomeBin_in, nomeBin_indice);
+
+	binarioNaTela2(nomeBin_indice);
+}
+
+/* Funcionalidade [11]: Permite a recuperação dos dados de todos os registros que satisfaçam um critério
+de busca determinado pelo usuário sobre o campo nomeServidor, usando o índice secundário fortemente ligado 
+criado na funcionalidade [10].*/
+void recuperaDados(){
+	char nomeBin_in[MAX];
+	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
+	char nomeServidor[MAX];
+	char valor[MAX];
+
+	scanf(" %s %s %s %s", nomeBin_in, nomeBin_indice, nomeServidor, valor);
+
+	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeServidor, valor);
+}
+
+/* Funcionalidade [12]: Estenda a funcionalidade [4] descrita no segundo trabalho prático de forma que,
+depois de cada remoção lógica no arquivo de dados, a chave de busca referente ao registro logicamente 
+removido seja removida do índice secundário fortemente ligado criado na funcionalidade [10].*/
+void removeChave(){
+	char nomeBin_in[MAX];
+	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
+	int n; //n = numero de vezes que a funcionalidade 12 será executada
+	char nomeCampo[MAX];
+	char valorCampo[MAX];
+
+	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+
+	for (int i = 0; i < n; ++i){
+		scanf("%s", nomeCampo);
+				if(strcmp(nomeCampo, "idServidor") == 0 || strcmp(nomeCampo, "salarioServidor") == 0){
+			scanf("%s", valorCampoBusca);
+		}
+		else{
+			scan_quote_string(valorCampoBusca);
+		}
+
+		//busca_RemoveChave(nomeBin, nomeCampo, valorCampo);
+	}
+
+
+	binarioNaTela2(nomeBin_indice);
+}
+
+/* Funcionalidade [13]: Estende a funcionalidade [5] descrita no segundo trabalho prático de forma que,
+depois de cada inserção de registro adicional no arquivo de dados, a chave de busca referente ao registro 
+inserido seja inserida no índice secundário fortemente ligado criado na funcionalidade [10]. */
+void insereChave(){
+	char nomeBin[MAX];
+	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
+	int n; //n = numero de vezes que a funcionalidade 4 será executada
+	scanf(" %s %d", nomeBin, nomeBin_indice, &n);
+
+	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
+	REGDADOS *rd;
+
+	long int ultimo_reg = -1;
+
+	for (int i = 0; i < n; ++i){
+		scanf("%s ", idStr);
+		scanf("%s ", salStr);
+		scan_quote_string(tel);
+		scan_quote_string(nome);
+		scan_quote_string(cargo);
+
+		rd = calloc(1, sizeof(REGDADOS));
+		
+		criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
+		//firstFit_insereChave(nomeBin, rd, &ultimo_reg);
+		
+		free(rd);
+	}
+
+	binarioNaTela2(nomeBin);
+
+}
+
+/* Funcionalidade [14]: Permite a realização de estatísticas considerando a recuperação dos dados de
+todos os registros que satisfaçam um critério de busca determinado pelo usuário sobre o campo nomeServidor.*/
+void estatisticas(){
+	char nomeBin_in[MAX];
+	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
+	char nomeCampo[MAX];
+	char valorCampo[MAX];
+
+	scanf(" %s %s %s %s", nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
+
+	calculaEstatisticas(nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
+
 }
