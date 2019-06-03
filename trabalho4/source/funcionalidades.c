@@ -263,6 +263,7 @@ void cria_arquivoIndice(){
 	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
 
 	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+	printf("novo indice |%s|%s|\n", nomeBin_in, nomeBin_indice);
 
 	novoIndice(nomeBin_in, nomeBin_indice);
 

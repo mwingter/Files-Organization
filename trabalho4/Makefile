@@ -6,8 +6,8 @@ NAME=programaTrab4
 INCDIR=include
 LIBDIR=lib
 BLDDIR=build
-SRCDIR=src
-OBJDIR=$(SRCDIR)/obj
+SRCDIR=source
+OBJDIR=$(BLDDIR)/obj
 
 # Can use any debbuger (like gdb) or overlay (like valgrind) (though gdb is an overlay too)
 DEBUGGER=
