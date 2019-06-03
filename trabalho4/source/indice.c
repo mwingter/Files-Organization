@@ -60,29 +60,27 @@ void regIndiceToArqBin(REGDADOSIND *rd_ind, FILE *bin_indice){
 void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
-	int tam_bin_in = tamArquivo(bin_in);
 
+	REGDADOSIND *rd_ind = calloc(1, sizeof(REGDADOSIND));
+	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 	FILE* bin_indice = fopen(nomeBin_indice, "wb");
-
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
+	rd = calloc(1, sizeof(REGDADOS));
+	
+	int tam_bin_in = tamArquivo(bin_in);
+	int tam_pagina = 0;
+	int pos = 0;
+	int n_reg = 0;
+
 	leCabecalho(bin_in, rc);
 
-	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 	rc_ind->status = 0;
 	rc_ind->nroRegistros = 0;
 
 	IndCabToArqBin(rc_ind, bin_indice); //primeira pagina preenchida
 
-	REGDADOS *rd = NULL;
-
-	REGDADOSIND *rd_ind = calloc(1, sizeof(REGDADOSIND));
-	int tam_pagina = 0;
-	int pos = 0;
-	int n_reg = 0;
-
 	while(ftell(bin_in) < tam_bin_in){
 		pos = ftell(bin_in);
-		rd = calloc(1, sizeof(REGDADOS));
 		rd->nomeServidor[0] = '\0';
 		leUmRegistroBin(bin_in, rd, &tam_pagina);
 		if(rd->removido == '-' && rd->nomeServidor[0] != '\0'){
@@ -92,15 +90,13 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 			rd_ind[n_reg-1].byteOffset = pos;
 		}
 
-		free(rd);
 	}
 
 	MS_sort(rd_ind, n_reg, sizeof(REGDADOSIND), int_compare_byteOffset);
 	MS_sort(rd_ind, n_reg, sizeof(REGDADOSIND), int_compare_chave);
 
 	//passando os registros de dados do indice para o arquivo de indice	
-	for (int i = 0; i < n_reg; ++i)
-	{
+	for (int i = 0; i < n_reg; ++i){
 		regIndiceToArqBin(&rd_ind[i], bin_indice);
 	}
 
@@ -116,44 +112,13 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 
 	fclose(bin_in); fclose(bin_indice);
 	free(rc_ind); free(rd_ind);
-	free(rc);
+	free(rc); free(rd);
 
 }
 
 
 //================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
 void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor){
-	FILE* bin_in = fopen(nomeBin_in, "rb");
-	check_file_status(bin_in);
-	int tam_bin_in = tamArquivo(bin_in);
-
-	FILE* bin_indice = fopen(nomeBin_indice, "wb");
-
-
-	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
-	fread(&rc_ind->status,STATUS_TAM,1,bin_in);
-	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_in);
-
-	REGDADOS *rd = NULL;
-	REGDADOSIND *rd_ind = NULL;
-
-	fseek(bin_in, TAM_PAG_DISCO, SEEK_SET);
-	while(ftell(bin_in) < tam_bin_in){
-		pos = ftell(bin_in);
-		rd = calloc(1, sizeof(REGDADOS));
-		rd->nomeServidor[0] = '\0';
-		leUmRegistroBin(bin_in, rd, &tam_pagina);
-		if(rd->removido == '-' && rd->nomeServidor[0] != '\0'){
-			n_reg++;
-			rd_ind = realloc(rd_ind, n_reg*sizeof(REGDADOSIND));
-			strcpy(rd_ind[n_reg-1].chaveBusca, rd->nomeServidor);
-			rd_ind[n_reg-1].byteOffset = pos;
-		}
-		free(rd);
-	}
-
-
-
 }
 
 
