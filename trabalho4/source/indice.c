@@ -150,6 +150,7 @@ void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 			rd_ind[n_reg-1].byteOffset = pos;
 		}
 		free(rd);
+		
 	}
 
 
