@@ -30,9 +30,10 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	rc_ind->nroRegistros = 0;
 
 	REGDADOSIND *rd_ind = calloc(1, sizeof(REGDADOSIND));
+	int tam_pagina = 0;
 
 	while(ftell(bin_in) < tam_bin_in){
-		
+		leUmRegistroBin(bin_in, rd_ind, &tam_pagina);
 	}
 
 
