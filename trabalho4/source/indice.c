@@ -10,12 +10,37 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "indice.h"
+
+
+
 //================ [10] CODIGOS PARA CRIAÇÃO DE NOVO INDICE =====================
 void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
+	int tam_bin_in = tamArquivo(bin_in);
 
 	FILE* bin_indice = fopen(nomeBin_indice, "wb");
+
+	REGCAB *rc = calloc(1, sizeof(REGCAB));
+	leCabecalho(bin_in, rc);
+
+	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+	rc_ind->status = 0;
+	rc_ind->nroRegistros = 0;
+
+	REGDADOSIND *rd_ind = calloc(1, sizeof(REGDADOSIND));
+
+	while(ftell(bin_in) < tam_bin_in){
+		
+	}
+
+
+	
+	rc_ind->status = 1;
+	//passar pro arquivo de indice tbm
+
+	fclose(bin_in); fclose(bin_indice);
 
 }
 

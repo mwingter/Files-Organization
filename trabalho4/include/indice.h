@@ -7,6 +7,10 @@
 */
 
 #ifndef INDICE_H
+
+	#include "organizaArq.h"
+	#include "rdados.h"
+	#include "rcab.h"
 	
 	#define INDICE_H
 	#define TAM_IND_CAB 5
@@ -34,6 +38,23 @@
 									busca associada – tamanho: inteiro de 8 bytes.*/
 	};
 
-	
+//================ [10] CODIGOS PARA CRIAÇÃO DE NOVO INDICE =====================
+void novoIndice(char *nomeBin_in, char *nomeBin_indice);
+
+
+//================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
+void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor);
+
+
+//================ [12] CODIGOS PARA REMOÇÃO NO INDICE ============================
+void busca_RemoveChave(char *nomeBin, char *nomeCampo, char *valorCampo);
+
+
+//================ [13] CODIGOS PARA INSERÇÃO NO INDICE ===========================
+void firstFit_insereChave(char *nomeBin, REGDADOS *rd, long int *ultimo_reg);
+
+
+//================ [15] CODIGOS PARA ATUALIZAÇÃO ==================================
+void calculaEstatisticas(char *nomeBin_in, char *nomeBin_indice, char *nomeCampo, char *valorCampo);
 
 #endif

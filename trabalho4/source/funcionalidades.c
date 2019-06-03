@@ -15,6 +15,8 @@
 #include "rdados.h"
 #include "manipulaReg.h"
 #include "organizaArq.h"
+#include "indice.h"
+
 
 /* Funcionalidade [1]: Permite a leitura de vários registros obtidos a partir de um arquivo de entrada
 (arquivo no formato CSV) e a gravação desses registros em um arquivo de dados de
@@ -290,19 +292,19 @@ removido seja removida do índice secundário fortemente ligado criado na funcio
 void removeChave(){
 	char nomeBin_in[MAX];
 	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
-	int n; //n = numero de vezes que a funcionalidade 12 será executada
+	int n = 0; //n = numero de vezes que a funcionalidade 12 será executada
 	char nomeCampo[MAX];
 	char valorCampo[MAX];
 
-	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+	scanf(" %s %s %d", nomeBin_in, nomeBin_indice, &n);
 
 	for (int i = 0; i < n; ++i){
 		scanf("%s", nomeCampo);
 				if(strcmp(nomeCampo, "idServidor") == 0 || strcmp(nomeCampo, "salarioServidor") == 0){
-			scanf("%s", valorCampoBusca);
+			scanf("%s", valorCampo);
 		}
 		else{
-			scan_quote_string(valorCampoBusca);
+			scan_quote_string(valorCampo);
 		}
 
 		//busca_RemoveChave(nomeBin, nomeCampo, valorCampo);
@@ -319,12 +321,12 @@ void insereChave(){
 	char nomeBin[MAX];
 	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
 	int n; //n = numero de vezes que a funcionalidade 4 será executada
-	scanf(" %s %d", nomeBin, nomeBin_indice, &n);
+	scanf(" %s %s %d", nomeBin, nomeBin_indice, &n);
 
 	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
 	REGDADOS *rd;
 
-	long int ultimo_reg = -1;
+	//long int ultimo_reg = -1;
 
 	for (int i = 0; i < n; ++i){
 		scanf("%s ", idStr);
