@@ -71,7 +71,7 @@ tar: clean
 
 zip: clean
 	@echo Compressing files...
-	@zip -r $(NAME).zip *
+	@zip -r $(NAME).zip source/*.c include/*.h make/Makefile
 	@echo Done.
 
 # Check if project has a name before creating it

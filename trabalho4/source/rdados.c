@@ -778,3 +778,14 @@ void criaNovoRegDados2(REGDADOS* rd, char* idStr, char* salStr, char* tel, char*
 	rd->tamanhoRegistro  += ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM + rd->tamNomeServidor + rd->tamCargoServidor;
 	rd->encadeamentoLista = -1;
 }
+
+void limpa_registro_dados(REGDADOS *rd){
+	rd->idServidor = 0;
+	rd->salarioServidor = 0;
+	rd->telefoneServidor[0] = 0;
+	rd->tamNomeServidor = 0;
+	rd->nomeServidor[0] = 0;
+	rd->tamCargoServidor = 0;
+	rd->cargoServidor[0] = 0;
+	rd->removido = 0;
+}

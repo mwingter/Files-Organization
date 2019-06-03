@@ -11,7 +11,7 @@
 #include <string.h>
 
 #include "indice.h"
-
+#include "rdados.h"
 
 
 //================ FUNÇÕES AUXILIARES ==========================================
@@ -64,8 +64,8 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	REGDADOSIND *rd_ind = calloc(1, sizeof(REGDADOSIND));
 	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 	FILE* bin_indice = fopen(nomeBin_indice, "wb");
+	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
-	rd = calloc(1, sizeof(REGDADOS));
 	
 	int tam_bin_in = tamArquivo(bin_in);
 	int tam_pagina = 0;
@@ -80,6 +80,7 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	IndCabToArqBin(rc_ind, bin_indice); //primeira pagina preenchida
 
 	while(ftell(bin_in) < tam_bin_in){
+		limpa_registro_dados(rd);
 		pos = ftell(bin_in);
 		rd->nomeServidor[0] = '\0';
 		leUmRegistroBin(bin_in, rd, &tam_pagina);
