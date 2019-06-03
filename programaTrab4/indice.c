@@ -98,7 +98,10 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	MS_sort(rd_ind, n_reg, sizeof(REGDADOSIND), int_compare_byteOffset);
 	MS_sort(rd_ind, n_reg, sizeof(REGDADOSIND), int_compare_chave);
 
-	//passando os registros de dados do indice para o arquivo de indice	
+	//passando os registros de dados do indice para o arquivo de indice
+
+
+	
 	for (int i = 0; i < n_reg; ++i)
 	{
 		regIndiceToArqBin(&rd_ind[i], bin_indice);
@@ -123,35 +126,6 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 
 //================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
 void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor){
-	FILE* bin_in = fopen(nomeBin_in, "rb");
-	check_file_status(bin_in);
-	int tam_bin_in = tamArquivo(bin_in);
-
-	FILE* bin_indice = fopen(nomeBin_indice, "wb");
-
-
-	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
-	fread(&rc_ind->status,STATUS_TAM,1,bin_in);
-	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_in);
-
-	REGDADOS *rd = NULL;
-	REGDADOSIND *rd_ind = NULL;
-
-	fseek(bin_in, TAM_PAG_DISCO, SEEK_SET);
-	while(ftell(bin_in) < tam_bin_in){
-		pos = ftell(bin_in);
-		rd = calloc(1, sizeof(REGDADOS));
-		rd->nomeServidor[0] = '\0';
-		leUmRegistroBin(bin_in, rd, &tam_pagina);
-		if(rd->removido == '-' && rd->nomeServidor[0] != '\0'){
-			n_reg++;
-			rd_ind = realloc(rd_ind, n_reg*sizeof(REGDADOSIND));
-			strcpy(rd_ind[n_reg-1].chaveBusca, rd->nomeServidor);
-			rd_ind[n_reg-1].byteOffset = pos;
-		}
-		free(rd);
-	}
-
 
 
 }

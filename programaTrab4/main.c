@@ -41,6 +41,21 @@ void menu(){
 		case 9:
 			match_twoFiles();
 			break;
+		case 10:
+			cria_arquivoIndice();
+			break;
+		case 11:
+			recuperaDados();
+			break;
+		case 12:
+			removeChave();
+			break;
+		case 13:
+			insereChave();
+			break;
+		case 14:
+			estatisticas();
+			break;
 
 		default:
 			printf("Opcao invalida.\n");
