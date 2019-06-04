@@ -35,7 +35,7 @@ ifdef debug
 	DEBUGGER=valgrind $(DBGFLAGS) 
 endif
 
-all: clean main
+all: main
 
 # Compile directives
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
@@ -56,7 +56,7 @@ go: main run
 
 # Utility directives
 clean:
-	-rm -f $(OBJDIR)/*.o
+	-rm *.bin *.txt *.index
 	clear
 	clear
 
