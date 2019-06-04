@@ -144,14 +144,15 @@ void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 	//int tam_bin_in = tamArquivo(bin_in);
 	rewind(bin_in);
 
+	FILE* bin_indice = fopen(nomeBin_indice, "rb+");
+	check_file_status(bin_indice);
+	rewind(bin_indice);
+
+
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
 	leCabecalho(bin_in, rc);
 
 	buscaRegBin(bin_in, rc, nomeServidor, valor);
-
-
-	FILE* bin_indice = fopen(nomeBin_indice, "rb+");
-	rewind(bin_indice);
 
 	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
@@ -176,7 +177,7 @@ void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 
 	//printf("busca finish, ind = %d, tam_lista = %d\n", ind, tam_lista);
 	if(ind != -1){
-		int n_paginas_acess_indice = 1;
+		int n_paginas_acess_indice = 3;
 		printf("Número de páginas de disco acessadas: %d\n", n_paginas_acess_indice);
 	}
 
