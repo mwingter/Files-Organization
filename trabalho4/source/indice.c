@@ -137,7 +137,7 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 
 
 //================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
-void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor){
+void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor, int estatisticas){
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
 	
@@ -195,12 +195,26 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 	}*/
 
 	//printf("busca finish, ind = %d, tam_lista = %d\n", ind, tam_lista);
-	if(ind != -1){
+	if(estatisticas == 1){
+		int p_dados = n_paginas_dados;
+		if(ind == -1){
+			printf("Registro inexistente.\n");
+			p_dados = 0; //pra contar a pagina de cabeçalho
+			//numPaginasAcessadas--;
+		}
 		printf("Número de páginas de disco para carregar o arquivo de índice: %d\n", n_paginas_indice);
-		printf("Número de páginas de disco para acessar o arquivo de dados: %d", n_paginas_dados);
+		printf("Número de páginas de disco para acessar o arquivo de dados: %d\n", p_dados+1);
+		int estat = numPaginasAcessadas - n_paginas_dados;
+		printf("\nA diferença no número de páginas de disco acessadas: %d\n", estat);
 	}
 	else{
-		printf("Registro inexistente.\n");
+		if(ind != -1){
+			printf("Número de páginas de disco para carregar o arquivo de índice: %d\n", n_paginas_indice);
+			printf("Número de páginas de disco para acessar o arquivo de dados: %d", n_paginas_dados);
+		}
+		else{
+			printf("Registro inexistente.\n");
+		}	
 	}
 
 
@@ -227,12 +241,32 @@ void firstFit_insereChave(char *nomeBin, REGDADOS *rd, long int *ultimo_reg){
 //================ [15] CODIGOS PARA ATUALIZAÇÃO ==================================
 void calculaEstatisticas(char *nomeBin_in, char *nomeBin_indice, char *nomeCampo, char *valorCampo){
 	printf("*** Realizando a busca sem o auxílio de índice\n");
-	
+	FILE* bin_in = fopen(nomeBin_in, "rb");
+	check_file_status(bin_in);
+
+	int tam_bin_in = tamArquivo(bin_in);
+	int numPaginasAcessadas = 1;
+	int tam_pag = 0;
+	int achei = 0;
+
+	REGCAB *rc = calloc(1, sizeof(REGCAB));
+	leCabecalho(bin_in, rc);
+	fseek(bin_in, TAM_PAG_DISCO, SEEK_SET);
+	//buscaRegBin(bin_in, rc, nomeCampo, valorCampo);
+	busca_nome(bin_in, tam_bin_in, valorCampo, &numPaginasAcessadas, &tam_pag, rc, &achei);
+	if(achei == 0){
+		printf("Registro inexistente.\n");
+	}
+	printf("Número de páginas de disco acessadas: %d\n", numPaginasAcessadas+1);
+
 
 
 
 	printf("*** Realizando a busca com o auxílio de um índice secundário fortemente ligado\n");
-	busca_eRecupera(nomeBin_in, nomeBin_indice, "nomeServidor", valorCampo);
+	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeCampo, valorCampo, 1);
 
 
+	//printf("\nA diferença no número de páginas de disco acessadas: %d\n", estatisticas);
+
+	free(rc); fclose(bin_in);
 }

@@ -51,7 +51,7 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice);
 
 
 //================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
-void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor);
+void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor, int estatisticas);
 
 
 //================ [12] CODIGOS PARA REMOÇÃO NO INDICE ============================

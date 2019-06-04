@@ -283,7 +283,7 @@ void recuperaDados(){
 
 	scanf(" %s %s %s %[^\r\n]", nomeBin_in, nomeBin_indice, nomeServidor, valor);
 
-	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeServidor, valor);
+	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeServidor, valor, 0);
 }
 
 /* Funcionalidade [12]: Estenda a funcionalidade [4] descrita no segundo trabalho prático de forma que,
@@ -355,7 +355,7 @@ void estatisticas(){
 	char nomeCampo[MAX];
 	char valorCampo[MAX];
 
-	scanf(" %s %s %s %s", nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
+	scanf(" %s %s %s %[^\r\n]", nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
 
 	calculaEstatisticas(nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
 
