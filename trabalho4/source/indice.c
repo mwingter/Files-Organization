@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "indice.h"
 #include "rdados.h"
@@ -57,8 +58,7 @@ void regIndiceToArqBin(REGDADOSIND *rd_ind, FILE *bin_indice){
 }
 
 
-int buscaBinaria(char chave[120], REGDADOSIND* lista, int low, int high) 
-{
+int buscaBinaria(char chave[120], REGDADOSIND* lista, int low, int high){
    int mid, cmp;
   // printf("comparando |%s| com |%s|\n", chave, lista[(low+high)/2].chaveBusca);
    if (low > high) return -1;
@@ -137,22 +137,28 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 
 
 //================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
-void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor){
-	//printf("buscando |%s|%s|\n", nomeServidor, valor);
+void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor){
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
-	//int tam_bin_in = tamArquivo(bin_in);
-	rewind(bin_in);
+	
 
-	FILE* bin_indice = fopen(nomeBin_indice, "rb+");
-	check_file_status(bin_indice);
-	rewind(bin_indice);
-
+	int tam_bin_in = tamArquivo(bin_in);
+	int numPaginasAcessadas = 1;
+	int tam_pag = 0;
+	int achei = 0;
+	int n_paginas_dados = 0;
 
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
 	leCabecalho(bin_in, rc);
+	//buscaRegBin(bin_in, rc, nomeServidor, valor);
+	fseek(bin_in, TAM_PAG_DISCO, SEEK_SET);
+	busca_nome(bin_in, tam_bin_in, valor, &numPaginasAcessadas, &tam_pag, rc, &achei);
 
-	buscaRegBin(bin_in, rc, nomeServidor, valor);
+
+	//printf("buscando |%s|%s|\n", nomeServidor, valor);
+	FILE* bin_indice = fopen(nomeBin_indice, "rb+");
+	check_file_status(bin_indice);
+	rewind(bin_indice);
 
 	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
@@ -167,24 +173,40 @@ void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 	{
 		fread(&rd_ind[i].chaveBusca,TAM_CHAVE,1,bin_indice);		
 		fread(&rd_ind[i].byteOffset,TAM_BYTEOFFSET,1,bin_indice);
-		//printf("|%s|%ld|\n", rd_ind[i].chaveBusca, rd_ind[i].byteOffset);	
+		if(strcmp(rd_ind[i].chaveBusca, valor) == 0){
+			//printf("|%s|%ld|----chave|%s|\n", rd_ind[i].chaveBusca, rd_ind[i].byteOffset, valor);	
+			n_paginas_dados++;
+		}
 	}
+	int n_paginas_indice = ceil((128.0 * (double)rc_ind->nroRegistros) / 32000.0);
+	//n_paginas_indice = ceil(n_paginas_indice);
 	
 
 	//fazer busca binaria pra achar o nome
 	int tam_lista = rc_ind->nroRegistros;
+	n_paginas_indice++; //contando a pagina de cabeçalho
 	int ind = buscaBinaria(valor, rd_ind, 0, tam_lista-1);
+
+	//buscar no arquivo de dados o registro encontrado
+/*	if(ind != -1){
+		//printf("Registro encontrado: %s %ld\n", rd_ind[ind].chaveBusca, rd_ind[ind].byteOffset);
+		fseek(bin_in, rd_ind[ind].byteOffset, SEEK_SET);
+
+	}*/
 
 	//printf("busca finish, ind = %d, tam_lista = %d\n", ind, tam_lista);
 	if(ind != -1){
-		int n_paginas_acess_indice = 3;
-		printf("Número de páginas de disco acessadas: %d\n", n_paginas_acess_indice);
+		printf("Número de páginas de disco para carregar o arquivo de índice: %d\n", n_paginas_indice);
+		printf("Número de páginas de disco para acessar o arquivo de dados: %d", n_paginas_dados);
+	}
+	else{
+		printf("Registro inexistente.\n");
 	}
 
 
-	fclose(bin_in); fclose(bin_indice);
+	fclose(bin_indice);
 	free(rc_ind); free(rd_ind);
-	free(rc);
+	free(rc); fclose(bin_in);
 }
 
 
@@ -204,6 +226,13 @@ void firstFit_insereChave(char *nomeBin, REGDADOS *rd, long int *ultimo_reg){
 
 //================ [15] CODIGOS PARA ATUALIZAÇÃO ==================================
 void calculaEstatisticas(char *nomeBin_in, char *nomeBin_indice, char *nomeCampo, char *valorCampo){
+	printf("*** Realizando a busca sem o auxílio de índice\n");
+	
+
+
+
+	printf("*** Realizando a busca com o auxílio de um índice secundário fortemente ligado\n");
+	busca_eRecupera(nomeBin_in, nomeBin_indice, "nomeServidor", valorCampo);
 
 
 }
