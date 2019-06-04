@@ -56,6 +56,24 @@ void regIndiceToArqBin(REGDADOSIND *rd_ind, FILE *bin_indice){
 	fwrite(&rd_ind->byteOffset, TAM_BYTEOFFSET, 1, bin_indice);
 }
 
+
+int buscaBinaria(char chave[120], REGDADOSIND* lista, int low, int high) 
+{
+   int mid, cmp;
+  // printf("comparando |%s| com |%s|\n", chave, lista[(low+high)/2].chaveBusca);
+   if (low > high) return -1;
+   else{
+	   mid = (low + high) / 2;
+	   cmp = strcmp(chave, lista[mid].chaveBusca);
+	   if (cmp == 0 ) 
+	      return mid;
+	   if (cmp < 0) 
+	      return buscaBinaria(chave, lista, low, mid - 1); 
+	   else 
+	      return buscaBinaria(chave, lista, mid + 1, high);   	
+   }
+}
+
 //================ [10] CODIGOS PARA CRIAÇÃO DE NOVO INDICE =====================
 void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	FILE* bin_in = fopen(nomeBin_in, "rb");
@@ -120,6 +138,52 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 
 //================ [11] CODIGOS PARA RECUPERAÇÃO DE DADOS ========================
 void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor, char *valor){
+	//printf("buscando |%s|%s|\n", nomeServidor, valor);
+	FILE* bin_in = fopen(nomeBin_in, "rb");
+	check_file_status(bin_in);
+	//int tam_bin_in = tamArquivo(bin_in);
+	rewind(bin_in);
+
+	REGCAB *rc = calloc(1, sizeof(REGCAB));
+	leCabecalho(bin_in, rc);
+
+	buscaRegBin(bin_in, rc, nomeServidor, valor);
+
+
+	FILE* bin_indice = fopen(nomeBin_indice, "rb+");
+	rewind(bin_indice);
+
+	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
+	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_indice);
+	//printf("Indice cab lido.... status = %c, nReg = %d\n", rc_ind->status, rc_ind->nroRegistros);
+
+	REGDADOSIND *rd_ind = calloc(rc_ind->nroRegistros, sizeof(REGDADOSIND));
+
+	fseek(bin_indice, TAM_PAG_DISCO, SEEK_SET);
+	//carregando o indice para a memoria
+	for (int i = 0; i < rc_ind->nroRegistros; ++i)
+	{
+		fread(&rd_ind[i].chaveBusca,TAM_CHAVE,1,bin_indice);		
+		fread(&rd_ind[i].byteOffset,TAM_BYTEOFFSET,1,bin_indice);
+		//printf("|%s|%ld|\n", rd_ind[i].chaveBusca, rd_ind[i].byteOffset);	
+	}
+	
+
+	//fazer busca binaria pra achar o nome
+	int tam_lista = rc_ind->nroRegistros;
+	int ind = buscaBinaria(valor, rd_ind, 0, tam_lista-1);
+
+	//printf("busca finish, ind = %d, tam_lista = %d\n", ind, tam_lista);
+	if(ind != -1){
+		int n_paginas_acess_indice = 1;
+		printf("Número de páginas de disco acessadas: %d\n", n_paginas_acess_indice);
+	}
+
+
+	fclose(bin_in); fclose(bin_indice);
+	free(rc_ind); free(rd_ind);
+	free(rc);
 }
 
 
