@@ -153,6 +153,7 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 	//buscaRegBin(bin_in, rc, nomeServidor, valor);
 	fseek(bin_in, TAM_PAG_DISCO, SEEK_SET);
 	busca_nome(bin_in, tam_bin_in, valor, &numPaginasAcessadas, &tam_pag, rc, &achei);
+	numPaginasAcessadas++;	
 
 
 	//printf("buscando |%s|%s|\n", nomeServidor, valor);
@@ -199,12 +200,12 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 		int p_dados = n_paginas_dados;
 		if(ind == -1){
 			printf("Registro inexistente.\n");
-			p_dados = 0; //pra contar a pagina de cabeçalho
+			p_dados = 1; //pra contar a pagina de cabeçalho
 			//numPaginasAcessadas--;
 		}
 		printf("Número de páginas de disco para carregar o arquivo de índice: %d\n", n_paginas_indice);
-		printf("Número de páginas de disco para acessar o arquivo de dados: %d\n", p_dados+1);
-		int estat = numPaginasAcessadas - n_paginas_dados;
+		printf("Número de páginas de disco para acessar o arquivo de dados: %d\n", p_dados);
+		int estat = numPaginasAcessadas - p_dados;
 		printf("\nA diferença no número de páginas de disco acessadas: %d\n", estat);
 	}
 	else{
