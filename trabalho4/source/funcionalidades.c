@@ -281,7 +281,7 @@ void recuperaDados(){
 	char nomeServidor[MAX];
 	char valor[MAX];
 
-	scanf(" %s %s %s %s", nomeBin_in, nomeBin_indice, nomeServidor, valor);
+	scanf(" %s %s %s %[^\r\n]", nomeBin_in, nomeBin_indice, nomeServidor, valor);
 
 	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeServidor, valor);
 }
