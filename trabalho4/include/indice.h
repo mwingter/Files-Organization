@@ -56,11 +56,11 @@ void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 
 //================ [12] CODIGOS PARA REMOÇÃO NO INDICE ============================
 void busca_RemoveChave_indice(REGDADOSIND *rd_ind, REGCABIND *rc_ind, char *valorCampo);
-void reescreve_arqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind);
+void listaIndice_toArqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind);
 
 
 //================ [13] CODIGOS PARA INSERÇÃO NO INDICE ===========================
-void firstFit_insereChave(char *nomeBin, REGDADOS *rd, long int *ultimo_reg);
+void firstFit_insereChave_indice(char *nomeBin, REGDADOS *rd, long int *ultimo_reg);
 
 
 //================ [15] CODIGOS PARA ATUALIZAÇÃO ==================================

@@ -233,7 +233,7 @@ void busca_RemoveChave_indice(REGDADOSIND *rd_ind, REGCABIND *rc_ind, char *valo
 
 }
 
-void reescreve_arqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind){
+void listaIndice_toArqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind){
 	FILE* bin_indice = fopen(nomeBin_indice, "wb");
 
 	IndCabToArqBin(rc_ind, bin_indice); //primeira pagina preenchida
@@ -248,7 +248,7 @@ void reescreve_arqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *r
 
 
 //================ [13] CODIGOS PARA INSERÇÃO NO INDICE ===========================
-void firstFit_insereChave(char *nomeBin, REGDADOS *rd, long int *ultimo_reg){
+void firstFit_insereChave_indice(char *nomeBin, REGDADOS *rd, long int *ultimo_reg){
 
 
 }
