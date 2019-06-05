@@ -297,6 +297,33 @@ void removeChave(){
 	char valorCampo[MAX];
 
 	scanf(" %s %s %d", nomeBin_in, nomeBin_indice, &n);
+	//FILE* bin_in = fopen(nomeBin_in, "rb+");
+	//check_file_status(bin_in);
+	FILE* bin_indice = fopen(nomeBin_indice, "rb");
+	check_file_status(bin_indice);
+
+
+	//primeiro, carrega-se o indice do disco para a memoria primaria
+	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+
+	rewind(bin_indice);
+
+	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
+	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_indice);
+	//printf("---------status: %c, numero de registros = %d\n", rc_ind->status, rc_ind->nroRegistros);
+
+	REGDADOSIND *rd_ind = calloc(rc_ind->nroRegistros, sizeof(REGDADOSIND));
+	
+	fseek(bin_indice, TAM_PAG_DISCO, SEEK_SET);
+	
+	for (int i = 0; i < rc_ind->nroRegistros; ++i){
+		fread(&rd_ind[i].chaveBusca,TAM_CHAVE,1,bin_indice);		
+		fread(&rd_ind[i].byteOffset,TAM_BYTEOFFSET,1,bin_indice);
+	}
+	fclose(bin_indice);
+	//=============================================================
+
+
 
 	for (int i = 0; i < n; ++i){
 		scanf("%s", nomeCampo);
@@ -307,8 +334,13 @@ void removeChave(){
 			scan_quote_string(valorCampo);
 		}
 
-		//busca_RemoveChave(nomeBin, nomeCampo, valorCampo);
+		busca_RemoveReg(nomeBin_in, nomeCampo, valorCampo); //rodando a funcionalidade 4
+		busca_RemoveChave_indice(rd_ind, rc_ind, valorCampo);
 	}
+
+	reescreve_arqIndice(nomeBin_indice, rd_ind, rc_ind);
+
+	free(rc_ind); free(rd_ind);
 
 
 	binarioNaTela2(nomeBin_indice);
@@ -343,7 +375,7 @@ void insereChave(){
 		free(rd);
 	}
 
-	binarioNaTela2(nomeBin);
+	//binarioNaTela2(nomeBin);
 
 }
 

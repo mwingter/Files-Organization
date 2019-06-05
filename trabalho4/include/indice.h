@@ -55,7 +55,8 @@ void busca_eRecupera(char *nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 
 
 //================ [12] CODIGOS PARA REMOÇÃO NO INDICE ============================
-void busca_RemoveChave(char *nomeBin, char *nomeCampo, char *valorCampo);
+void busca_RemoveChave_indice(REGDADOSIND *rd_ind, REGCABIND *rc_ind, char *valorCampo);
+void reescreve_arqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind);
 
 
 //================ [13] CODIGOS PARA INSERÇÃO NO INDICE ===========================

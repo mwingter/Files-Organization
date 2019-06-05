@@ -215,13 +215,35 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 
 
 //================ [12] CODIGOS PARA REMOÇÃO NO INDICE ============================
-void busca_RemoveChave(char *nomeBin, char *nomeCampo, char *valorCampo){
-	FILE* bin = fopen(nomeBin, "rb");
-	check_file_status(bin);
+void busca_RemoveChave_indice(REGDADOSIND *rd_ind, REGCABIND *rc_ind, char *valorCampo){
+	int ind = buscaBinaria(valorCampo, rd_ind, 0, rc_ind->nroRegistros-1);
+	//printf("numero de registros no indice = %d\n", rc_ind->nroRegistros);
 
+	if(ind != -1){
+		for (int i = ind; i < (rc_ind->nroRegistros-1); ++i)
+		{
+			//printf("ANTES |%s|\n", rd_ind[i].chaveBusca);
+			rd_ind[i] = rd_ind[i+1];
+			//printf("DEPOIS |%s|\n", rd_ind[i].chaveBusca);
 
-	fclose(bin);
+		}
+		//rd_ind[rc_ind->nroRegistros] = NULL;
+		rc_ind->nroRegistros--;
+	}
 
+}
+
+void reescreve_arqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind){
+	FILE* bin_indice = fopen(nomeBin_indice, "wb");
+
+	IndCabToArqBin(rc_ind, bin_indice); //primeira pagina preenchida
+
+	//passando os registros de dados do indice para o arquivo de indice	
+	for (int i = 0; i < rc_ind->nroRegistros; ++i){
+		regIndiceToArqBin(&rd_ind[i], bin_indice);
+	}
+
+	fclose(bin_indice);
 }
 
 
