@@ -145,7 +145,7 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 	
 
 	int tam_bin_in = tamArquivo(bin_in);
-	int *paginasAcessadas = calloc(sizeof(int), tam_bin_in/TAM_PAG_DISCO);
+	int *paginasAcessadas = calloc(sizeof(int), (tam_bin_in/TAM_PAG_DISCO + 1));
 	int numPaginasAcessadas = 1;
 	int n_paginas_dados = 1;
 	int n_paginas_indice;
@@ -191,7 +191,6 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 		if(ind == -1){
 			printf("Registro inexistente.\n");
 			p_dados = 1; //pra contar a pagina de cabeçalho
-			//numPaginasAcessadas--;
 		}
 		printf("Número de páginas de disco para carregar o arquivo de índice: %d\n", n_paginas_indice);
 		printf("Número de páginas de disco para acessar o arquivo de dados: %d\n", p_dados);
@@ -217,7 +216,11 @@ void busca_eRecupera(char* nomeBin_in, char *nomeBin_indice, char *nomeServidor,
 
 //================ [12] CODIGOS PARA REMOÇÃO NO INDICE ============================
 void busca_RemoveChave(char *nomeBin, char *nomeCampo, char *valorCampo){
+	FILE* bin = fopen(nomeBin, "rb");
+	check_file_status(bin);
 
+
+	fclose(bin);
 
 }
 
