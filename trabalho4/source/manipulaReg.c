@@ -828,8 +828,8 @@ void insere_umReg_naPos(FILE* bin, REGDADOS* rd, long int pos/*, int tam_lixo*/)
  				ultimo_reg: posição do ultimo registro (antes de inserir o novo)
 */
 void insere_umReg_noFim(FILE* bin, REGDADOS* rd, long int* ultimo_reg){
-	printf("\n\t=====entrando em insere_umReg_noFim\n");
-	printf("Tamanho do registro = %d\n", rd->tamanhoRegistro);
+	//printf("\n\t=====entrando em insere_umReg_noFim\n");
+	//printf("Tamanho do registro = %d\n", rd->tamanhoRegistro);
 	char tagN = 'n';
 	char tagC = 'c';
 

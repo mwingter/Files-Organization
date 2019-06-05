@@ -22,5 +22,6 @@
 	int int_compare_id(const void *A, const void *B);
 	int recalcula_tam_registro(REGDADOS *rd);
 	void avancaProximo(REGDADOS *rd1, REGDADOS *rd2, FILE *bin_in1, FILE *bin_in2, int *tam_pagina1, int *tam_pagina2);
+	void check_file_status(FILE *fp);
 
 #endif

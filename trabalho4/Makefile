@@ -6,8 +6,8 @@ NAME=programaTrab4
 INCDIR=include
 LIBDIR=lib
 BLDDIR=build
-SRCDIR=src
-OBJDIR=$(SRCDIR)/obj
+SRCDIR=source
+OBJDIR=$(BLDDIR)/obj
 
 # Can use any debbuger (like gdb) or overlay (like valgrind) (though gdb is an overlay too)
 DEBUGGER=
@@ -35,7 +35,7 @@ ifdef debug
 	DEBUGGER=valgrind $(DBGFLAGS) 
 endif
 
-all: clean main
+all: main
 
 # Compile directives
 $(OBJDIR)/%.o: $(SRCDIR)/%.c $(DEPS)
@@ -56,7 +56,7 @@ go: main run
 
 # Utility directives
 clean:
-	-rm -f $(OBJDIR)/*.o
+	-rm *.bin *.txt *.index
 	clear
 	clear
 
@@ -71,7 +71,7 @@ tar: clean
 
 zip: clean
 	@echo Compressing files...
-	@zip -r $(NAME).zip *
+	@zip -j $(NAME).zip source/*.c include/*.h make/Makefile
 	@echo Done.
 
 # Check if project has a name before creating it

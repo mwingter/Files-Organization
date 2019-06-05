@@ -15,6 +15,8 @@
 #include "rdados.h"
 #include "manipulaReg.h"
 #include "organizaArq.h"
+#include "indice.h"
+
 
 /* Funcionalidade [1]: Permite a leitura de vários registros obtidos a partir de um arquivo de entrada
 (arquivo no formato CSV) e a gravação desses registros em um arquivo de dados de
@@ -263,6 +265,7 @@ void cria_arquivoIndice(){
 	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
 
 	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+	//printf("novo indice |%s|%s|\n", nomeBin_in, nomeBin_indice);
 
 	novoIndice(nomeBin_in, nomeBin_indice);
 
@@ -278,9 +281,9 @@ void recuperaDados(){
 	char nomeServidor[MAX];
 	char valor[MAX];
 
-	scanf(" %s %s %s %s", nomeBin_in, nomeBin_indice, nomeServidor, valor);
+	scanf(" %s %s %s %[^\r\n]", nomeBin_in, nomeBin_indice, nomeServidor, valor);
 
-	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeServidor, valor);
+	busca_eRecupera(nomeBin_in, nomeBin_indice, nomeServidor, valor, 0);
 }
 
 /* Funcionalidade [12]: Estenda a funcionalidade [4] descrita no segundo trabalho prático de forma que,
@@ -289,23 +292,52 @@ removido seja removida do índice secundário fortemente ligado criado na funcio
 void removeChave(){
 	char nomeBin_in[MAX];
 	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
-	int n; //n = numero de vezes que a funcionalidade 12 será executada
+	int n = 0; //n = numero de vezes que a funcionalidade 12 será executada
 	char nomeCampo[MAX];
 	char valorCampo[MAX];
 
-	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+	scanf(" %s %s %d", nomeBin_in, nomeBin_indice, &n);
+
+	FILE* bin_indice = fopen(nomeBin_indice, "rb");
+	check_file_status(bin_indice);
+
+
+	//primeiro, carrega-se o indice do disco para a memoria primaria
+	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+
+	rewind(bin_indice);
+
+	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
+	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_indice);
+
+	REGDADOSIND *rd_ind = calloc(rc_ind->nroRegistros, sizeof(REGDADOSIND));
+	
+	fseek(bin_indice, TAM_PAG_DISCO, SEEK_SET);
+	
+	for (int i = 0; i < rc_ind->nroRegistros; ++i){
+		fread(&rd_ind[i].chaveBusca,TAM_CHAVE,1,bin_indice);		
+		fread(&rd_ind[i].byteOffset,TAM_BYTEOFFSET,1,bin_indice);
+	}
+	fclose(bin_indice);
+	//=============================================================
+
 
 	for (int i = 0; i < n; ++i){
 		scanf("%s", nomeCampo);
 				if(strcmp(nomeCampo, "idServidor") == 0 || strcmp(nomeCampo, "salarioServidor") == 0){
-			scanf("%s", valorCampoBusca);
+			scanf("%s", valorCampo);
 		}
 		else{
-			scan_quote_string(valorCampoBusca);
+			scan_quote_string(valorCampo);
 		}
 
-		//busca_RemoveChave(nomeBin, nomeCampo, valorCampo);
+		busca_RemoveReg(nomeBin_in, nomeCampo, valorCampo); //rodando a funcionalidade 4
+		busca_RemoveChave_indice(rd_ind, rc_ind, valorCampo);
 	}
+
+	listaIndice_toArqIndice(nomeBin_indice, rd_ind, rc_ind); //reescrevendo o indice do zero
+
+	free(rc_ind); free(rd_ind);
 
 
 	binarioNaTela2(nomeBin_indice);
@@ -318,10 +350,32 @@ void insereChave(){
 	char nomeBin[MAX];
 	char nomeBin_indice[MAX]; //arquivo binário de índice secundário fortemente ligado que indexa o campo nomeServidor.
 	int n; //n = numero de vezes que a funcionalidade 4 será executada
-	scanf(" %s %d", nomeBin, nomeBin_indice, &n);
+	scanf(" %s %s %d", nomeBin, nomeBin_indice, &n);
+
+	//primeiro, carrega-se o indice do disco para a memoria primaria
+	FILE* bin_indice = fopen(nomeBin_indice, "rb");
+	check_file_status(bin_indice);fclose(bin_indice);
+/*	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+
+	rewind(bin_indice);
+
+	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
+	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_indice);
+
+	REGDADOSIND *rd_ind = calloc(rc_ind->nroRegistros, sizeof(REGDADOSIND));
+	
+	fseek(bin_indice, TAM_PAG_DISCO, SEEK_SET);
+	
+	for (int i = 0; i < rc_ind->nroRegistros; ++i){
+		fread(&rd_ind[i].chaveBusca,TAM_CHAVE,1,bin_indice);		
+		fread(&rd_ind[i].byteOffset,TAM_BYTEOFFSET,1,bin_indice);
+	}
+	fclose(bin_indice);
+*/	//=============================================================
 
 	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
-	REGDADOS *rd;
+	REGDADOS *rd = NULL;
+	REGDADOSIND *novo = NULL;
 
 	long int ultimo_reg = -1;
 
@@ -333,15 +387,22 @@ void insereChave(){
 		scan_quote_string(cargo);
 
 		rd = calloc(1, sizeof(REGDADOS));
+		novo = calloc(1, sizeof(REGDADOSIND));
 		
 		criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
-		//firstFit_insereChave(nomeBin, rd, &ultimo_reg);
+		//novo->chaveBusca = rd->nomeServidor;
+		//novo->byteOffset = 
+
+		firstFit_insere(nomeBin, rd, &ultimo_reg); //inserindo no arquivo de dados
+		//firstFit_insereChave_indice(nomeBin, novo, rd_ind); //inserindo na lista de indice
 		
-		free(rd);
+		free(rd); free(novo);
 	}
 
-	binarioNaTela2(nomeBin);
+	//listaIndice_toArqIndice(nomeBin_indice, rd_ind, rc_ind); //reescrevendo a lista de indice no arquivo de indice
+	novoIndice(nomeBin, nomeBin_indice);
 
+	binarioNaTela2(nomeBin_indice);
 }
 
 /* Funcionalidade [14]: Permite a realização de estatísticas considerando a recuperação dos dados de
@@ -352,7 +413,7 @@ void estatisticas(){
 	char nomeCampo[MAX];
 	char valorCampo[MAX];
 
-	scanf(" %s %s %s %s", nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
+	scanf(" %s %s %s %[^\r\n]", nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
 
 	calculaEstatisticas(nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
 
