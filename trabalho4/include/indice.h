@@ -45,6 +45,7 @@ int int_compare_chave(const void *A, const void *B);
 int int_compare_byteOffset(const void *A, const void *B);
 void IndCabToArqBin(REGCABIND *rc_ind, FILE *bin_indice);
 void regIndiceToArqBin(REGDADOSIND *rd_ind, FILE *bin_indice);
+int buscaBinaria(char chave[120], REGDADOSIND* lista, int low, int high);
 
 //================ [10] CODIGOS PARA CRIAÇÃO DE NOVO INDICE =====================
 void novoIndice(char *nomeBin_in, char *nomeBin_indice);
@@ -59,11 +60,7 @@ void busca_RemoveChave_indice(REGDADOSIND *rd_ind, REGCABIND *rc_ind, char *valo
 void listaIndice_toArqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIND *rc_ind);
 
 
-//================ [13] CODIGOS PARA INSERÇÃO NO INDICE ===========================
-void firstFit_insereChave_indice(char *nomeBin, REGDADOS *rd, long int *ultimo_reg);
-
-
-//================ [15] CODIGOS PARA ATUALIZAÇÃO ==================================
+//================ [14] CODIGOS PARA ESTATISTICAS ==================================
 void calculaEstatisticas(char *nomeBin_in, char *nomeBin_indice, char *nomeCampo, char *valorCampo);
 
 #endif

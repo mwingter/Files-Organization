@@ -13,7 +13,11 @@
 #include "rcab.h"
 
 /*
-	Lê o cabeçalho de um arquivo csv, e salva na struct de cabeçalho rc
+ * criaRegCabecalho
+ * Função: Lê o cabeçalho de um arquivo csv, e salva na struct de cabeçalho.
+ * Parâmetros: 	
+ 				f: Arquivo csv
+ 				rc: Registro de cabeçalho
 */
 void criaRegCabecalho(FILE* f, REGCAB* rc){
 	char ch;
@@ -73,7 +77,6 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 	strcpy(rc->campos[2], c3);
 	strcpy(rc->campos[3], c4);
 	strcpy(rc->campos[4], c5);
-	//printf("c5 = %s, e no rc fica = %s\n", c5, rc->campos[4]);
 
 	//completando o primeiro byte com \0
 	for(int i = 0; i < 5; i++){
@@ -87,9 +90,6 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 			rc->campos[j][i] = '@';
 		}
 	}
-
-	printf("\tREG CABEÇALHO: \n");
-	//printf("\t%.40s\n\t%.40s\n\t%.40s\n\t%.40s\n\t%.40s\n\n", rc->campos[0], rc->campos[1], rc->campos[2], rc->campos[3], rc->campos[4]);
 	
 	rc->tags[0] = 'i';
 	rc->tags[1] = 's';
@@ -102,13 +102,16 @@ void criaRegCabecalho(FILE* f, REGCAB* rc){
 
 	rc->topoLista = -1;
 
-	//status(1), topoLista(8), tag1(1), campo1(40), tag2(1), campo2(40),......., tag5(1), campo5(40) => totalBytes= 10+5+200 = 215
-	printf("|%c|%ld|%c|%s|%c|%s|%c|%s|%c|%s|%c|%s|\n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3], rc->tags[4], rc->campos[4]);
-
 	free(c1);free(c2);free(c3);free(c4);free(c5);
-
 }
 
+/*
+ * regCabToArqBin
+ * Função: Escreve um registro de cabeçalho em um arquivo binário.
+ * Parâmetros: 	
+ 				bin: Arquivo binário
+ 				c: Registro de cabeçalho
+*/
 void regCabToArqBin(REGCAB* c, FILE* bin){
 
 	int tamRegistroCab = 214;//1+8+1+40+1+40+1+40+1+40+1+40
@@ -145,6 +148,13 @@ void regCabToArqBin(REGCAB* c, FILE* bin){
 	}
 }
 
+/*
+ * atualizaStatus
+ * Função: Atualiza o status do cabeçalho de um arquivo binário para 1.
+ * Parâmetros: 	
+ 				bin: Arquivo binário
+ 				rc: Registro de cabeçalho
+*/
 void atualizaStatus(REGCAB* rc, FILE* bin){
 	strcpy(&rc->status, "1");
 	fseek(bin, 0, SEEK_SET);
@@ -152,11 +162,13 @@ void atualizaStatus(REGCAB* rc, FILE* bin){
 }
 
 /*
-	Lê o cabeçalho de um arquivo binário e salva os dados na struct de cabeçalho rc
+ * leCabecalho
+ * Função: Lê o cabeçalho de um arquivo binário e salva os dados na struct de cabeçalho.
+ * Parâmetros: 	
+ 				bin: Arquivo binário
+ 				rc: Registro de cabeçalho
 */
-void leCabecalho(FILE* bin, REGCAB *rc) {
-	//rc = calloc(1, sizeof(REGCAB));
-	
+void leCabecalho(FILE* bin, REGCAB *rc) {	
 	fread(&rc->status, STATUS_TAM, 1, bin);
 
 	if (rc->status == 0) {
@@ -168,11 +180,5 @@ void leCabecalho(FILE* bin, REGCAB *rc) {
 	for (int i = 0; i < 5; i++) {
 		fread(&rc->tags[i], TAG_TAM, 1, bin);
 		fread(rc->campos[i], CAMPO_TAM, 1, bin);
-	//	printf("NA FUNC LECABEÇALHO CAMPO = %s\n", rc->campos[i]);
 	}
-	//printf("TAMANHO %d, e %d", TAM_PAG_DISCO - CAB_TAM);
-	
-
-	//printf("\nNa função leCabecalho\nstatus = %c, topoLista = %ld, tag[0] = %c, campo[0] = %s, tag[1] = %c, campo[1] = %s, tag[2] = %c, campo[2] = %s, tag[3] = %c, campo[3] = %s \n", rc->status, rc->topoLista, rc->tags[0], rc->campos[0], rc->tags[1], rc->campos[1], rc->tags[2], rc->campos[2], rc->tags[3], rc->campos[3]);
-
 }

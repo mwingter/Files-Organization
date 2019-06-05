@@ -1,9 +1,9 @@
 /*
 	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+	Obs: Para a continuação apartir do T3, foi utilizado o código de Michelle wingter da Silva.
 
 	Nome:	Michelle Wingter da Silva	nUSP:	10783243
 			Juliano Fantozzi					9791218
-
 */
 
 #include "funcionalidades.h"

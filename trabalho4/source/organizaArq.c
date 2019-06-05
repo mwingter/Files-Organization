@@ -12,10 +12,16 @@
 
 #include "organizaArq.h"
 
-
-
-
 //========================== FUNCOES AUXILIARES ======================
+/*
+ * int_compare_id
+ * Função: Compara dois valores de id.
+ * Parâmetros: 	
+ 				A: valor 1
+ 				B: valor 2
+
+ * Retorno: Resultado de B - A.
+*/
 int int_compare_id(const void *A, const void *B) { // para ordenar de forma crescente
 	REGDADOS *pA, *pB;
 	pA = (REGDADOS *) A;
@@ -23,9 +29,15 @@ int int_compare_id(const void *A, const void *B) { // para ordenar de forma cres
 	return pB->idServidor - pA->idServidor;
 }
 
+/*
+ * recalcula_tam_registro
+ * Função: Recalcula o tamanho de um dado registro de dados.
+ * Parâmetros: 	
+ 				rd: Registro de dados
+
+ * Retorno: Novo tamanho do registro de dados.
+*/
 int recalcula_tam_registro(REGDADOS *rd){
-	//printf("\nRecalcula tam registro\n");
-	//printf("nome = %s\n", rd->nomeServidor);
 	int tam = ENC_TAM + ID_TAM + SAL_TAM + TEL_TAM;
 	if(rd->nomeServidor[0] != '\0'){
 		tam += rd->tamNomeServidor - 1;
@@ -40,6 +52,20 @@ int recalcula_tam_registro(REGDADOS *rd){
 	return tam;
 }
 
+/*
+ * avancaProximo
+ * Função: Lê um registro de um dos dois arquivos de dados recebidos (o registro que for menor será 
+ 			substituido pela nova leitura no arquivo correspondente, ou seja, se o registro 1 for menor, 
+ 			ele será lido do arquivo 1, se o 2 for menor será lido do arquivo 2).
+
+ * Parâmetros: 	
+ 				rd1: Registro de dados 1
+ 				rd2: Registro de dados 2
+ 				bin_in1: Arquivo binário de dados 1
+ 				bin_in2: Arquivo binário de dados 2
+ 				tam_pagina1: Ponteiro para controlar o tamanho da pagina do arquivo 1
+ 				tam_pagina2: Ponteiro para controlar o tamanho da pagina do arquivo 2
+*/
 void avancaProximo(REGDADOS *rd1, REGDADOS *rd2, FILE *bin_in1, FILE *bin_in2, int *tam_pagina1, int *tam_pagina2){
 	if(rd1->idServidor < rd2->idServidor){
 		free(rd1);
@@ -53,21 +79,36 @@ void avancaProximo(REGDADOS *rd1, REGDADOS *rd2, FILE *bin_in1, FILE *bin_in2, i
 	}
 }
 
-void check_file_status(FILE *fp){
-	if(fp == NULL){
+/*
+ * check_file_status
+ * Função: Checa se um dado arquivo binário de dados possui falhas de processamento. Se houverem falhas, imprime "Falha no processamento do arquivo" e fecha o programa.
+
+ * Parâmetros: 	
+ 				bin: Arquivo binário de dados.
+*/
+void check_file_status(FILE *bin){
+	if(bin == NULL){
 		printf("Falha no processamento do arquivo.\n");
 		exit(0);
 	}
 	char status;
-	fread(&status, STATUS_TAM, 1, fp);
+	fread(&status, STATUS_TAM, 1, bin);
 	if (status == '0') {
 		printf("Falha no processamento do arquivo.\n");
-		fclose(fp);
+		fclose(bin);
 		exit(0);
 	}
 }
 
 //============================= ORDENAÇÃO INTERNA ===========================
+/*
+ * ordena_por_id
+ * Função: Ordena um arquivo binário, reescrevendo-o ordenado em um novo arquivo.
+
+ * Parâmetros: 	
+ 				nomeBin_in: Nome do arquivo binário desordenado dado.
+ 				nomeBin_out: Nome do arquivo binário ordenado que será criado.
+*/
 void ordena_por_id(char *nomeBin_in, char *nomeBin_out){
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
@@ -136,6 +177,15 @@ void ordena_por_id(char *nomeBin_in, char *nomeBin_out){
 }
 
 //========================== MERGING DE DOIS ARQUIVOS ======================
+/*
+ * read_andMerge
+ * Função: Realiza a união de dois arquivos binários dados, considerando o campo idServidor, e cria um novo arquivo com essa união.
+
+ * Parâmetros: 	
+ 				nomeBin_in1: Nome do arquivo binário 1 dado.
+ 				nomeBin_in2: Nome do arquivo binário 2 dado.
+ 				nomeBin_out: Nome do arquivo binário criado com a união dos arquivos 1 e 2.
+*/
 void read_andMerge(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 	FILE* bin_in1 = fopen(nomeBin_in1, "rb");
 	FILE* bin_in2 = fopen(nomeBin_in2, "rb");
@@ -233,6 +283,15 @@ void read_andMerge(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 }
 
 //========================== MATCHING DE DOIS ARQUIVOS ======================
+/*
+ * read_andMatch
+ * Função: Realiza a intersecção de dois arquivos binários dados, considerando o campo idServidor, e cria um novo arquivo com essa intersecção.
+
+ * Parâmetros: 	
+ 				nomeBin_in1: Nome do arquivo binário 1 dado.
+ 				nomeBin_in2: Nome do arquivo binário 2 dado.
+ 				nomeBin_out: Nome do arquivo binário criado com a intersecção dos arquivos 1 e 2.
+*/
 void read_andMatch(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 	FILE* bin_in1 = fopen(nomeBin_in1, "rb");
 	FILE* bin_in2 = fopen(nomeBin_in2, "rb");
@@ -273,7 +332,6 @@ void read_andMatch(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 	
 	//percorrendo o arquivo e montando a rd de structs de registros de dados
 	while((ftell(bin_in1) < tam_bin_in1) || (ftell(bin_in2) < tam_bin_in2)){
-		//printf("comparando %d com %d\n", rd1->idServidor, rd2->idServidor);
 
 		if(rd1->idServidor < rd2->idServidor){
 
@@ -290,7 +348,6 @@ void read_andMatch(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 			if(rd1->removido == '*'){
 				continue;
 			}
-			//printf("deu match!\n");
 			rd1->tamanhoRegistro = recalcula_tam_registro(rd1);
 			structToBin(&tam_pagina_out, &tamRegAnt, rd1, rc, bin_out);
 			
@@ -310,7 +367,6 @@ void read_andMatch(char *nomeBin_in1, char *nomeBin_in2, char *nomeBin_out){
 		}
 	}
  
-
 	fclose(bin_in1);fclose(bin_in2);fclose(bin_out);
 	free(rc); free(rc2);free(rd1); free(rd2);
 }
