@@ -353,9 +353,9 @@ void insereChave(){
 	scanf(" %s %s %d", nomeBin, nomeBin_indice, &n);
 
 	//primeiro, carrega-se o indice do disco para a memoria primaria
-/*	FILE* bin_indice = fopen(nomeBin_indice, "rb");
-	check_file_status(bin_indice);
-	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+	FILE* bin_indice = fopen(nomeBin_indice, "rb");
+	check_file_status(bin_indice);fclose(bin_indice);
+/*	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 
 	rewind(bin_indice);
 

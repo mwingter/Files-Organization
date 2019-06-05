@@ -82,6 +82,7 @@ void novoIndice(char *nomeBin_in, char *nomeBin_indice){
 	REGDADOSIND *rd_ind = calloc(1, sizeof(REGDADOSIND));
 	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
 	FILE* bin_indice = fopen(nomeBin_indice, "wb");
+	check_file_status(bin_indice);
 	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
 	
