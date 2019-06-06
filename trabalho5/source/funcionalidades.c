@@ -349,14 +349,37 @@ void insereChave(){
 	int n; //n = numero de vezes que a funcionalidade 4 será executada
 	scanf(" %s %s %d", nomeBin, nomeBin_indice, &n);
 
+	//primeiro, carrega-se o indice do disco para a memoria primaria
 	FILE* bin_indice = fopen(nomeBin_indice, "rb");
-	check_file_status(bin_indice);fclose(bin_indice);
+	check_file_status(bin_indice);
+
+	REGCABIND *rc_ind = calloc(1, sizeof(REGCABIND));
+
+	rewind(bin_indice);
+	fread(&rc_ind->status,STATUS_TAM,1,bin_indice);
+	fread(&rc_ind->nroRegistros,TAM_TAM,1,bin_indice);
+
+	REGDADOSIND *rd_ind = calloc(rc_ind->nroRegistros, sizeof(REGDADOSIND));
+	
+	fseek(bin_indice, TAM_PAG_DISCO, SEEK_SET);
+	
+	for (int i = 0; i < rc_ind->nroRegistros; ++i){
+		fread(&rd_ind[i].chaveBusca,TAM_CHAVE,1,bin_indice);		
+		fread(&rd_ind[i].byteOffset,TAM_BYTEOFFSET,1,bin_indice);
+	}
+	fclose(bin_indice);
+	//=============================================================
 
 	char idStr[MAX], salStr[MAX], tel[MAX], nome[MAX], cargo[MAX];
 	REGDADOS *rd = NULL;
 	REGDADOSIND *novo = NULL;
 
 	long int ultimo_reg = -1;
+
+	FILE *bin_in = fopen(nomeBin, "rb");
+	fseek(bin_in, 0, SEEK_END);
+	long int pos = ftell(bin_in);
+	fclose(bin_in);
 
 	for (int i = 0; i < n; ++i){
 		scanf("%s ", idStr);
@@ -365,17 +388,35 @@ void insereChave(){
 		scan_quote_string(nome);
 		scan_quote_string(cargo);
 
-		rd = calloc(1, sizeof(REGDADOS));
-		novo = calloc(1, sizeof(REGDADOSIND));
-		
-		criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
-		firstFit_insere(nomeBin, rd, &ultimo_reg); //inserindo no arquivo de dados
-		
-		free(rd); free(novo);
+		if(strcmp(nome, "") != 0){
+			rd = calloc(1, sizeof(REGDADOS));
+			novo = calloc(1, sizeof(REGDADOSIND));
+			
+			criaNovoRegDados2(rd, idStr, salStr, tel, nome, cargo);
+			firstFit_insere(nomeBin, rd, &ultimo_reg); //inserindo no arquivo de dados
+
+			strcpy(novo->chaveBusca, rd->nomeServidor);
+			novo->byteOffset = pos;
+			rc_ind->nroRegistros++;
+			
+			rd_ind = realloc(rd_ind, rc_ind->nroRegistros * sizeof(REGDADOSIND));
+			strcpy(rd_ind[rc_ind->nroRegistros - 1].chaveBusca, novo->chaveBusca);
+			rd_ind[rc_ind->nroRegistros - 1].byteOffset = novo->byteOffset;
+			pos = pos + rd->tamanhoRegistro;
+			
+			free(rd); free(novo);			
+		}
 	}
 
-	novoIndice(nomeBin, nomeBin_indice);
+	//ordenando a lista de indices
+	MS_sort(rd_ind, rc_ind->nroRegistros, sizeof(REGDADOSIND), int_compare_byteOffset);
+	MS_sort(rd_ind, rc_ind->nroRegistros, sizeof(REGDADOSIND), int_compare_chave);
+
+	//passando a lista de indice para o arquivo de indice
+	listaIndice_toArqIndice(nomeBin_indice, rd_ind, rc_ind);
+
 	binarioNaTela2(nomeBin_indice);
+	free(rc_ind); free(rd_ind);
 }
 
 /* Funcionalidade [14]: Permite a realização de estatísticas considerando a recuperação dos dados de
