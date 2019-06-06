@@ -315,7 +315,6 @@ void listaIndice_toArqIndice(char *nomeBin_indice, REGDADOSIND *rd_ind, REGCABIN
 	fclose(bin_indice);
 }
 
-
 //================ [14] CODIGOS PARA ESTATISTICAS ==================================
 /*
  * calculaEstatisticas
