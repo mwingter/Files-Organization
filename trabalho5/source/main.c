@@ -56,6 +56,12 @@ void menu(){
 		case 14:
 			estatisticas();
 			break;
+		case 15:
+			cria_indice_arvoreB();
+			break;
+		case 16:
+			recuperaDados_arvoreB();
+			break;
 
 		default:
 			printf("Opcao invalida.\n");

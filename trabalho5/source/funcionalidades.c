@@ -16,6 +16,7 @@
 #include "manipulaReg.h"
 #include "organizaArq.h"
 #include "indice.h"
+#include "arvoreB.h"
 
 
 
@@ -430,4 +431,25 @@ void estatisticas(){
 	scanf(" %s %s %s %[^\r\n]", nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
 
 	calculaEstatisticas(nomeBin_in, nomeBin_indice, nomeCampo, valorCampo);
+}
+
+/* Funcionalidade [15]: Cria um arquivo de índice árvore-B para um arquivo de dados de entrada já existente. */
+void cria_indice_arvoreB(){
+
+}
+
+/* [16] Permita a recuperação dos dados de todos os registros que satisfaçam um critério de busca determinado 
+pelo usuário sobre o campo idServidor, usando o índice árvore-B criado na funcionalidade [15].*/
+void recuperaDados_arvoreB(){
+	char nomeBin_in[MAX];
+	char nomeBin_indice[MAX]; 
+	char idServidor[MAX];
+	int valor;
+
+	scanf(" %s %s %s %d", nomeBin_in, nomeBin_indice, idServidor, &valor);
+	//printf("|%s|%s|%s|%d|\n", nomeBin_in, nomeBin_indice, idServidor, valor);
+
+	REGISTRO_ARVORE* novoRegistro = CriaRegistroArvore();
+
+	
 }

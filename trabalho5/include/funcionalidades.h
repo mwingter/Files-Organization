@@ -26,5 +26,9 @@
 	void insereChave(); // Funcionalidade [13]
 	void estatisticas(); // Funcionalidade [14]
 
+	//============== TRABALHO 5 =================
+	void cria_indice_arvoreB(); // Funcionalidade [15]
+	void recuperaDados_arvoreB(); // Funcionalidade [16]
+
 
 #endif
