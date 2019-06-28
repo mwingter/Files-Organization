@@ -435,10 +435,20 @@ void estatisticas(){
 
 /* Funcionalidade [15]: Cria um arquivo de índice árvore-B para um arquivo de dados de entrada já existente. */
 void cria_indice_arvoreB(){
+	char nomeBin_in[MAX];
+	char nomeBin_indice[MAX]; 
 
+	scanf(" %s %s", nomeBin_in, nomeBin_indice);
+	//printf("|%s|%s|\n", nomeBin_in, nomeBin_indice);
+
+	//cria_arvoreB(nomeBin_in, nomeBin_indice);
+
+
+
+	//binarioNaTela2(nomeBin_indice);
 }
 
-/* [16] Permita a recuperação dos dados de todos os registros que satisfaçam um critério de busca determinado 
+/* Funcionalidade [16]: Permite a recuperação dos dados de todos os registros que satisfaçam um critério de busca determinado 
 pelo usuário sobre o campo idServidor, usando o índice árvore-B criado na funcionalidade [15].*/
 void recuperaDados_arvoreB(){
 	char nomeBin_in[MAX];
@@ -449,7 +459,34 @@ void recuperaDados_arvoreB(){
 	scanf(" %s %s %s %d", nomeBin_in, nomeBin_indice, idServidor, &valor);
 	//printf("|%s|%s|%s|%d|\n", nomeBin_in, nomeBin_indice, idServidor, valor);
 
-	REGISTRO_ARVORE* novoRegistro = CriaRegistroArvore();
+	FILE* bin_in = fopen(nomeBin_in, "rb");
+	check_file_status(bin_in);
+	int nivel = 0;
 
+	long int ind = busca_e_recupera_arvoreB(nomeBin_indice, valor, &nivel);
+	//printf("ind encontrado %ld\n", ind);
+
+
+
+	
+	if (ind != -1)
+	{
+		REGCAB *rc = calloc(1, sizeof(REGCAB));
+		rewind(bin_in);
+		leCabecalho(bin_in, rc);
+
+		fseek(bin_in, ind, SEEK_SET);
+
+		int tam_pagina = 0;
+		REGDADOS *rd = calloc(1, sizeof(REGDADOS));
+		leUmRegistroBin(bin_in, rd, &tam_pagina);
+		printaRegEncontrado(rc, rd);
+		printf("Número de níveis do índice árvore-B percorridos: %d\n", nivel);
+	}
+	else{
+		printf("Registro inexistente.\n");
+		//exit(0);	
+	}
+	fclose(bin_in);
 	
 }

@@ -6,12 +6,12 @@
 
 */
 
-#include "arvoreB.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "arvoreB.h"
 #include "rdados.h"
 #include "manipulaReg.h"
 #include "organizaArq.h"
@@ -22,22 +22,183 @@
 #define POSICAO_ULTIMO_RRN POSICAO_ALTURA + 4
 
 
+//====================== [15] CRIAR ARVORE B =========================
+/*void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
+	printf("Entrei no cria_arvoreB\n");
+	FILE* bin_in = fopen(nomeBin_in, "rb");
+	check_file_status(bin_in);
 
-void nova_arvoreB() {
-	FILE* fp = fopen(ARQUIVO_ARVORE, "wb+");
+	FILE* bin_indice = fopen(nomeBin_indice, "wb+");
+	check_file_status(bin_indice);
+
+	//ler os arquivo de dados e salvar
+	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
+	REGCAB *rc = calloc(1, sizeof(REGCAB));
+	REGISTRO_ARVORE* reg_arvore = CriaRegistroArvore();
+	int n_reg = 0;
+	int n_paginas = 1;
+	int pos = 0;
+	int tam_pagina = 0;
+	int subarvore = -1;
+
+	rewind(bin_in);
+	int tam_bin_in = tamArquivo(bin_in);
+	leCabecalho(bin_in, rc);
+
+	printf("tamanho do arq %d\n", tam_bin_in);
+
+	while(ftell(bin_in) < tam_bin_in){
+		printf("Entrei no loop do arq dados. Chamando limpa_registro_dados\n");
+		limpa_registro_dados(rd);
+		pos = ftell(bin_in);
+		//rd->nomeServidor[0] = '\0';
+		printf("Chamando leUmRegistroBin\n");
+		leUmRegistroBin(bin_in, rd, &tam_pagina);
+		if(rd->removido == '-'){
+			n_reg++;
+			reg_arvore[n_paginas-1].quantidadeChaves++;
+			reg_arvore[n_paginas-1].eFolha = 1;
+			printf("Chamando InsereChaveNoIndiceArvore\n");
+			InsereChaveNoIndiceArvore(reg_arvore, subarvore, rd->idServidor, pos);
+			if(n_reg == 7){
+				n_paginas++;
+				n_reg = 0;
+				//reg_arvore = realloc(reg_arvore, n_paginas*sizeof(REGISTRO_ARVORE));
+			}
+			//reg_arvore[n_reg-1] = CriaRegistroArvore();
+			//reg_arvore[n_reg-1].chaveBusca = rd->idServidor;
+			//reg_arvore[n_reg-1].ponteiroDados = pos;
+		}
+	}
+
+	//escreve o cabeçalho do arquivo de indice de arvore B no arquivo
+	printf("chamando nova_arvoreB\n");
+	nova_arvoreB(bin_indice); 
+
+	//passando os registros de indice de arvoreB para o arquivo de arvoreB
+	//for (int i = 0; i < n_paginas; ++i)
+	//{
+		InsereReg_naArvore(bin_indice, reg_arvore);
+	//}
+
+
+
+}
+*/
+
+//================= [16] RECUPERAR DADOS NA ARVORE B =================
+long int busca_e_recupera_arvoreB(char* nomeBin_indice, int valor, int* nivel){
+	FILE* bin_indice = fopen(nomeBin_indice, "rb");
+	check_file_status(bin_indice);
+
+	//int tam_bin_in = tamArquivo(bin_in);
+	//int *paginasAcessadas = calloc(sizeof(int), (tam_bin_in/TAM_PAG_DISCO + 1));
+	//int numPaginasAcessadas = 1;
+	//int n_paginas_dados = 1;
+	//int n_paginas_indice = 0;
+	//int tam_pag = 0;
+	//int achei = 0;
+
+	//REGCAB *rc = calloc(1, sizeof(REGCAB));
+	
+	//leCabecalho(bin_in, rc);
+	//fseek(bin_in, TAM_PAG_DISCO, SEEK_SET);
+	//busca_id(bin_in, tam_bin_in, valor, &numPaginasAcessadas, &tam_pag, rc, &achei);
+	//numPaginasAcessadas++;	
+
+	rewind(bin_indice);
+
+	//carregando o indice para a memoria
+	char status;
+	int noRaiz;
+	//faz a leitura do status e noRaiz
+	fread(&status, sizeof(char), 1, bin_indice);
+	if (status != 1){
+		printf("Falha no processamento do arquivo.\n");
+		exit(0);
+	}
+	fread(&noRaiz, sizeof(int), 1, bin_indice);
+
+	fseek(bin_indice, BYTE_OFFSET_ARVORE(noRaiz), SEEK_SET); //indo pro nó raiz
+
+
+	//n_paginas_indice++; //contando a pagina de cabeçalho
+	long int ind = -1;
+	ind = BuscaArvoreB(bin_indice, LeRegistroArvore(bin_indice, noRaiz), valor, nivel); //fazendo busca na arvore pra achar o id
+
+	
+
+	fclose(bin_indice);
+	return ind;
+
+}
+
+
+
+
+//======================== FUNÇÕES AUXILIARES ========================
+/*void InsereReg_naArvore(FILE* bin_indice, REGISTRO_ARVORE* registro) {
+	if (registro == NULL) //verifica se o registro e o RRN são válidos
+		return;
+
+	//efetua a escrita dos dados do registro que estão salvos na struct
+	fwrite(&registro->quantidadeChaves, sizeof(int), 1, bin_indice);
+	for(int i = 0; i < ORDEM_DA_ARVORE-1; i++){
+		fwrite(&registro->ponteiroSubarvore[i], sizeof(int), 1, bin_indice);
+		fwrite(&registro->chaveBusca[i], sizeof(int), 1, bin_indice);
+		fwrite(&registro->ponteiroDados[i], sizeof(int), 1, bin_indice);
+	}
+	fwrite(&registro->ponteiroSubarvore[ORDEM_DA_ARVORE-1], sizeof(int), 1, bin_indice);
+}
+
+REGISTRO_ARVORE* CriaRegistroArvore() {
+	//aloca espaço para a struct que salvará as informações do registro da árvore B
+	//iniciando com -1 os ponteiros e a chave de busca
+	REGISTRO_ARVORE* registro = (REGISTRO_ARVORE*)malloc(sizeof(REGISTRO_ARVORE));
+	registro->quantidadeChaves = 0;
+	memset(registro->ponteiroSubarvore, -1, sizeof(int) * (ORDEM_DA_ARVORE + 1));
+	memset(registro->chaveBusca, -1, sizeof(int) * (ORDEM_DA_ARVORE));
+	memset(registro->ponteiroDados, -1, sizeof(int) * (ORDEM_DA_ARVORE));
+
+	return registro;
+}
+
+void nova_arvoreB(FILE* bin_indice) {
 	char status = 0;	// Status para indicar a consistência do arquivo.
 	int noRaiz = -1;	// RRN do nó raíz.
 
-	fwrite(&status, sizeof(status), 1, fp);
-	fwrite(&noRaiz, sizeof(noRaiz), 1, fp);
+	fwrite(&status, sizeof(status), 1, bin_indice);
+	fwrite(&noRaiz, sizeof(noRaiz), 1, bin_indice);
 
-	int restoPagina = TAMANHO_PAGINA - 2;
+	int restoPagina = TAMANHO_PAGINA - CABECALHO_ARVORE;
 	char arroba = '@';
 	for(int i = 0; i < restoPagina; i++){ //preenchendo com @ o resto da pagina
-		fwrite(&arroba, sizeof(char), 1, fp);
+		fwrite(&arroba, sizeof(char), 1, bin_indice);
 	}
+}
 
-	fclose(fp);
+// Função responsável por inserir uma nova chave de busca em um nó da árvore B. Não trata dos casos
+// de overflow, e só deve ser chamada após conferir se o nó não está cheio.
+int InsereChaveNoIndiceArvore(REGISTRO_ARVORE* registro, int subarvore, int chaveBusca, int campoReferencia) {
+	if (registro == NULL)
+		return -1;
+
+	int i = 0;
+
+	// Procura o lugar em que a chave deve ser inserida, de modo a manter o registro ordenado.
+	while (i < registro->quantidadeChaves && chaveBusca > registro->chaveBusca[i]) ++i;
+
+	if (chaveBusca == registro->chaveBusca[i]) // Caso a chave a ser inserida já exista.
+		return 0;
+
+	DeslocaChavesParaDireita(registro, i);	// Abre espaço para inserir uma nova chave.
+
+	registro->quantidadeChaves++;
+	registro->ponteiroSubarvore[i+1] = subarvore;
+	registro->chaveBusca[i] = chaveBusca;
+	registro->ponteiroDados[i] = campoReferencia;
+
+	return 1;
 }
 
 void AlteraRRNdaRaiz(int RRN) {
@@ -124,17 +285,7 @@ int UltimoRRN() {
 	return RRN; //retorna o ultimo RRN
 }
 
-REGISTRO_ARVORE* CriaRegistroArvore() {
-	//aloca espaço para a struct que salvará as informações do registro da árvore B
-	//iniciando com -1 os ponteiros e a chave de busca
-	REGISTRO_ARVORE* registro = (REGISTRO_ARVORE*)malloc(sizeof(REGISTRO_ARVORE));
-	registro->quantidadeChaves = 0;
-	memset(registro->ponteiroSubarvore, -1, sizeof(int) * (ORDEM_DA_ARVORE + 1));
-	memset(registro->chaveBusca, -1, sizeof(int) * (ORDEM_DA_ARVORE));
-	memset(registro->ponteiroDados, -1, sizeof(int) * (ORDEM_DA_ARVORE));
 
-	return registro;
-}
 
 void InsereRegistroArvore(REGISTRO_ARVORE* registro, int RRN) {
 	if (registro == NULL || RRN < 0) //verifica se o registro e o RRN são válidos
@@ -158,14 +309,11 @@ void InsereRegistroArvore(REGISTRO_ARVORE* registro, int RRN) {
 	
 	fclose(fp);
 }
+*/
 
-REGISTRO_ARVORE* LeRegistroArvore(int RRN) {
+REGISTRO_ARVORE* LeRegistroArvore(FILE *bin_indice, int RRN) {
 
-	FILE *fp = fopen(ARQUIVO_ARVORE, "rb");
-	if (fp == NULL) //verifica se o arquivo foi aberto corretamente
-		return NULL;
-
-	fseek(fp, BYTE_OFFSET_ARVORE(RRN), SEEK_SET); //vai para a posição do RRN desejado
+	fseek(bin_indice, BYTE_OFFSET_ARVORE(RRN), SEEK_SET); //vai para a posição do RRN desejado
 
 	//aloca espaço para um novo registro na struct REGISTRO_ARVORE
 	REGISTRO_ARVORE *reg = (REGISTRO_ARVORE*) malloc(sizeof(REGISTRO_ARVORE));
@@ -174,22 +322,27 @@ REGISTRO_ARVORE* LeRegistroArvore(int RRN) {
 	//salva as informações do registro da arvoreB na struct
 	//sendo elas a quantidade de chaves, ponteiros para o arquivo de indíce,
 	//chaves de busca e ponteiros para o arquivo de dados 
-	fread(&reg->quantidadeChaves, sizeof(int), 1, fp);
+	fread(&reg->eFolha, sizeof(char), 1, bin_indice);
+	//printf("Folha = %c\n", reg->eFolha);
+	fread(&reg->quantidadeChaves, sizeof(int), 1, bin_indice);
+	//printf("n = %d\n", reg->quantidadeChaves);
 
 	for(int i = 0; i < ORDEM_DA_ARVORE-1; i++){
 
-		fread(&reg->ponteiroSubarvore[i], sizeof(int), 1, fp);
-		fread(&reg->chaveBusca[i], sizeof(int), 1, fp);
-		fread(&reg->ponteiroDados[i], sizeof(int), 1, fp);
+		fread(&reg->ponteiroSubarvore[i], sizeof(int), 1, bin_indice);
+		//printf("subarvore = %d\n", reg->ponteiroSubarvore[i]);
+		fread(&reg->chaveBusca[i], sizeof(int), 1, bin_indice);
+		//printf("chave = %d\n", reg->chaveBusca[i]);
+		fread(&reg->ponteiroDados[i], sizeof(long int), 1, bin_indice);
+		//printf("ponteiroDados = %ld\n", reg->ponteiroDados[i]);
 	}
 
-	fread(&reg->ponteiroSubarvore[ORDEM_DA_ARVORE-1], sizeof(int), 1, fp);
-
-	fclose(fp);
+	fread(&reg->ponteiroSubarvore[ORDEM_DA_ARVORE-1], sizeof(int), 1, bin_indice);
+	//printf("ponteiroSubarvore = %d\n", reg->ponteiroSubarvore[ORDEM_DA_ARVORE-1]);
 	
 	return reg; //retorna o endereço da struct que acabou de ser criada
 }
-
+/*
 void AtualizaRegistroArvore(REGISTRO_ARVORE* registro, int RRNAtual) {
 
 	// atualiza o registro no bufferpool
@@ -419,10 +572,10 @@ int InsereIndice(int chaveBusca, int campoReferencia) {
 
 	return 0;
 }
-
+*/
 //função de busca recursiva
-int BuscaArvoreB(REGISTRO_ARVORE *reg, int chave){
-
+long int BuscaArvoreB(FILE* bin_indice, REGISTRO_ARVORE *reg, int chave, int* nivel){
+	(*nivel)++;
 	int i = 0;
 
 	//procura pela posição com a chave de busca imediatamente menor que a procurada
@@ -432,9 +585,9 @@ int BuscaArvoreB(REGISTRO_ARVORE *reg, int chave){
 
 	//verifica se já encontrou a chave
 	if(chave == reg->chaveBusca[i]) {
-		int RRN = reg->ponteiroDados[i];
+		int pos = reg->ponteiroDados[i];
 		free(reg);
-		return RRN;
+		return pos;
 	}
 
 	//se for nó folha e não encontrou a chave a ser buscada é porque ela não existe
@@ -444,9 +597,10 @@ int BuscaArvoreB(REGISTRO_ARVORE *reg, int chave){
 	//vai para o filho da posição atual e continua pela busca
 	int filho = reg->ponteiroSubarvore[i];
 	free(reg);
-	return BuscaArvoreB(LeRegistroArvore(filho), chave);
+	return BuscaArvoreB(bin_indice, LeRegistroArvore(bin_indice, filho), chave, nivel);
 }
 
+/*
 //imprime as informações do registro da árvore B tais como a quantidade de chaves,
 //os ponteiros da subarvore, as chaves de busca e os ponteiros do arquivo de dados
 void ImprimeRegistroArvore(REGISTRO_ARVORE* reg) {
@@ -500,3 +654,4 @@ void ImprimeArquivoArvoreB() {
 
 	printf("\n");
 }
+*/
