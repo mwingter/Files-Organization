@@ -37,7 +37,9 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 
 	FILE* bin_indice = fopen(nomeBin_indice, "wb+");
 	check_file_status(bin_indice);
-/*
+
+/*	NAO SEI OQ TA CERTO APARTIR DAQUI
+
 	//ler os arquivo de dados e salvar
 	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
