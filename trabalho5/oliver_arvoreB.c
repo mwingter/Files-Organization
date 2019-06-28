@@ -132,7 +132,7 @@ void InsereRegistroArvore(REGISTRO_ARVORE* registro, int RRN) {
 		return;
 
 	//vai para a posição do RRN desejado
-	fseek(fp, BYTE_OFFSET_ARVORE(RRN), SEEK_SET);
+	fseek(fp, 	(RRN), SEEK_SET);
 
 	//efetua a escrita dos dados do registro que estão salvos na struct
 	fwrite(&registro->quantidadeChaves, sizeof(int), 1, fp);
