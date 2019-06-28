@@ -113,7 +113,7 @@ long int busca_e_recupera_arvoreB(char* nomeBin_indice, int valor, int* nivel){
 	int noRaiz;
 	//faz a leitura do status e noRaiz
 	fread(&status, sizeof(char), 1, bin_indice);
-	if (status != 1){
+	if (status == 0){
 		printf("Falha no processamento do arquivo.\n");
 		exit(0);
 	}
