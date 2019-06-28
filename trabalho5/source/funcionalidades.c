@@ -439,7 +439,6 @@ void cria_indice_arvoreB(){
 	char nomeBin_indice[MAX]; 
 
 	scanf(" %s %s", nomeBin_in, nomeBin_indice);
-	//printf("|%s|%s|\n", nomeBin_in, nomeBin_indice);
 
 	cria_arvoreB(nomeBin_in, nomeBin_indice);
 
@@ -457,17 +456,12 @@ void recuperaDados_arvoreB(){
 	int valor;
 
 	scanf(" %s %s %s %d", nomeBin_in, nomeBin_indice, idServidor, &valor);
-	//printf("|%s|%s|%s|%d|\n", nomeBin_in, nomeBin_indice, idServidor, valor);
 
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
 	int nivel = 0;
 
 	long int ind = busca_e_recupera_arvoreB(nomeBin_indice, valor, &nivel);
-	//printf("ind encontrado %ld\n", ind);
-
-
-
 	
 	if (ind != -1)
 	{
@@ -484,8 +478,7 @@ void recuperaDados_arvoreB(){
 		printf("Número de níveis do índice árvore-B percorridos: %d\n", nivel);
 	}
 	else{
-		printf("Registro inexistente.\n");
-		//exit(0);	
+		printf("Registro inexistente.\n");	
 	}
 	fclose(bin_in);
 	
