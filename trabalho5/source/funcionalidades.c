@@ -441,11 +441,11 @@ void cria_indice_arvoreB(){
 	scanf(" %s %s", nomeBin_in, nomeBin_indice);
 	//printf("|%s|%s|\n", nomeBin_in, nomeBin_indice);
 
-	//cria_arvoreB(nomeBin_in, nomeBin_indice);
+	cria_arvoreB(nomeBin_in, nomeBin_indice);
 
 
 
-	//binarioNaTela2(nomeBin_indice);
+	binarioNaTela2(nomeBin_indice);
 }
 
 /* Funcionalidade [16]: Permite a recuperação dos dados de todos os registros que satisfaçam um critério de busca determinado 

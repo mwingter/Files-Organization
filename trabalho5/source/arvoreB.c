@@ -23,14 +23,14 @@
 
 
 //====================== [15] CRIAR ARVORE B =========================
-/*void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
-	printf("Entrei no cria_arvoreB\n");
+void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
+	//printf("Entrei no cria_arvoreB\n");
 	FILE* bin_in = fopen(nomeBin_in, "rb");
 	check_file_status(bin_in);
 
 	FILE* bin_indice = fopen(nomeBin_indice, "wb+");
 	check_file_status(bin_indice);
-
+/*
 	//ler os arquivo de dados e salvar
 	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
@@ -81,10 +81,9 @@
 		InsereReg_naArvore(bin_indice, reg_arvore);
 	//}
 
-
-
-}
 */
+}
+
 
 //================= [16] RECUPERAR DADOS NA ARVORE B =================
 long int busca_e_recupera_arvoreB(char* nomeBin_indice, int valor, int* nivel){
@@ -113,10 +112,11 @@ long int busca_e_recupera_arvoreB(char* nomeBin_indice, int valor, int* nivel){
 	int noRaiz;
 	//faz a leitura do status e noRaiz
 	fread(&status, sizeof(char), 1, bin_indice);
-	if (status == 0){
+	if (status == '0'){
 		printf("Falha no processamento do arquivo.\n");
 		exit(0);
 	}
+
 	fread(&noRaiz, sizeof(int), 1, bin_indice);
 
 	fseek(bin_indice, BYTE_OFFSET_ARVORE(noRaiz), SEEK_SET); //indo pro nó raiz
@@ -126,6 +126,8 @@ long int busca_e_recupera_arvoreB(char* nomeBin_indice, int valor, int* nivel){
 	long int ind = -1;
 	ind = BuscaArvoreB(bin_indice, LeRegistroArvore(bin_indice, noRaiz), valor, nivel); //fazendo busca na arvore pra achar o id
 
+	rewind(bin_indice);
+	check_file_status(bin_indice);
 	
 
 	fclose(bin_indice);
