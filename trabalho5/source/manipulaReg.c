@@ -1,5 +1,5 @@
 /*
-	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+	TRABALHO 5 - ORGANIZAÇÃO DE ARQUIVOS
 
 	Nome:	Michelle Wingter da Silva	nUSP:	10783243
 			Juliano Fantozzi					9791218

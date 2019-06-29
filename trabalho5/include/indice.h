@@ -1,11 +1,3 @@
-/*
-	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
-
-	Nome:	Michelle Wingter da Silva	nUSP:	10783243
-			Juliano Fantozzi					9791218
-
-*/
-
 #ifndef INDICE_H
 
 	#include "organizaArq.h"

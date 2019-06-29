@@ -1,5 +1,5 @@
 /*
-	TRABALHO 3 - ORGANIZAÇÃO DE ARQUIVOS
+	TRABALHO 5 - ORGANIZAÇÃO DE ARQUIVOS
 	Obs: Para a continuação apartir do T3, foi utilizado o código de Michelle wingter da Silva.
 
 	Nome:	Michelle Wingter da Silva	nUSP:	10783243
@@ -55,6 +55,12 @@ void menu(){
 			break;
 		case 14:
 			estatisticas();
+			break;
+		case 15:
+			cria_indice_arvoreB();
+			break;
+		case 16:
+			recuperaDados_arvoreB();
 			break;
 
 		default:
