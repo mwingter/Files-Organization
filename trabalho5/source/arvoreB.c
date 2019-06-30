@@ -36,14 +36,14 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 	check_file_status(bin_in);
 
 	FILE* bin_indice = fopen(nomeBin_indice, "wb+");
-	check_file_status(bin_indice);
+	//check_file_status(bin_indice);
 
 
 
 	//ler os arquivo de dados e salvar
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
-	/*REGDADOS *rd = calloc(1, sizeof(REGDADOS));
-	REGISTRO_ARVORE* reg_arvore = CriaRegistroArvore();
+	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
+	/*REGISTRO_ARVORE* reg_arvore = CriaRegistroArvore();
 	int n_reg = 0;
 	int n_paginas = 1;
 	int pos = 0;
@@ -53,7 +53,8 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 	rewind(bin_in);
 	//int tam_bin_in = tamArquivo(bin_in);
 	leCabecalho(bin_in, rc);
-	nova_arvoreB(bin_indice); //criando um novo arquivo de arvore B
+	//escrevendo o cabeçalho no arquivo de indice de arvore B
+	nova_arvoreB(bin_indice); 
 
 	//printf("tamanho do arq %d\n", tam_bin_in);
 /*
@@ -81,7 +82,6 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 		}
 	}
 */
-	//escreve o cabeçalho do arquivo de indice de arvore B no arquivo
 
 /*
 	//passando os registros de indice de arvoreB para o arquivo de arvoreB
@@ -99,6 +99,7 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 	fwrite(&status, sizeof(status), 1, bin_indice);
 
 	fclose(bin_in); fclose(bin_indice);
+	free(rc); free(rd);
 
 
 }
@@ -189,7 +190,6 @@ REGISTRO_ARVORE* LeRegistroArvore(FILE *bin_indice, int RRN) {
 	return reg; //retorna o endereço da struct que acabou de ser criada
 }
 
-//função de busca recursiva
 /*
  * BuscaArvoreB
  * Função: Busca um registro de determinada chave (id) em um arquivo de indice em um arquivo de indice árvore B.
@@ -228,16 +228,23 @@ long int BuscaArvoreB(FILE* bin_indice, REGISTRO_ARVORE *reg, int chave, int* ni
 	return BuscaArvoreB(bin_indice, LeRegistroArvore(bin_indice, filho), chave, nivel);
 }
 
+/*
+ * nova_arvoreB
+ * Função: Recebe um arquivo de indice de arvore B e escreve a pagina de cabeçalho, com status 0 e no Raiz -1.
+ * Parâmetros: 	
+ 				bin_indice: Arquivo de indice de arvore B.
+*/
 void nova_arvoreB(FILE* bin_indice) {
-	char status = '0';	// Status para indicar a consistência do arquivo.
+	char status = '0';	// Status que indica a consistência do arquivo.
 	int noRaiz = -1;	// RRN do nó raíz.
 
 	fwrite(&status, sizeof(status), 1, bin_indice);
-	fwrite(&noRaiz, sizeof(noRaiz), 1, bin_indice);
+	fwrite(&noRaiz, sizeof(noRaiz), 1, bin_indice); 
 
 	int restoPagina = TAMANHO_PAGINA - CABECALHO_ARVORE;
 	char arroba = '@';
-	for(int i = 0; i < restoPagina; i++){ //preenchendo com @ o resto da pagina
+	// Preenchendo com @ o resto da pagina
+	for(int i = 0; i < restoPagina; i++){ 
 		fwrite(&arroba, sizeof(char), 1, bin_indice);
 	}
 }
