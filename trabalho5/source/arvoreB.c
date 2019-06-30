@@ -38,36 +38,37 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 	FILE* bin_indice = fopen(nomeBin_indice, "wb+");
 	check_file_status(bin_indice);
 
-/*	NAO SEI OQ TA CERTO APARTIR DAQUI
+
 
 	//ler os arquivo de dados e salvar
-	REGDADOS *rd = calloc(1, sizeof(REGDADOS));
 	REGCAB *rc = calloc(1, sizeof(REGCAB));
+	/*REGDADOS *rd = calloc(1, sizeof(REGDADOS));
 	REGISTRO_ARVORE* reg_arvore = CriaRegistroArvore();
 	int n_reg = 0;
 	int n_paginas = 1;
 	int pos = 0;
 	int tam_pagina = 0;
 	int subarvore = -1;
-
+	*/
 	rewind(bin_in);
-	int tam_bin_in = tamArquivo(bin_in);
+	//int tam_bin_in = tamArquivo(bin_in);
 	leCabecalho(bin_in, rc);
+	nova_arvoreB(bin_indice); //criando um novo arquivo de arvore B
 
-	printf("tamanho do arq %d\n", tam_bin_in);
-
+	//printf("tamanho do arq %d\n", tam_bin_in);
+/*
 	while(ftell(bin_in) < tam_bin_in){
-		printf("Entrei no loop do arq dados. Chamando limpa_registro_dados\n");
+		//printf("Entrei no loop do arq dados. Chamando limpa_registro_dados\n");
 		limpa_registro_dados(rd);
 		pos = ftell(bin_in);
 		//rd->nomeServidor[0] = '\0';
-		printf("Chamando leUmRegistroBin\n");
+		//printf("Chamando leUmRegistroBin\n");
 		leUmRegistroBin(bin_in, rd, &tam_pagina);
 		if(rd->removido == '-'){
 			n_reg++;
 			reg_arvore[n_paginas-1].quantidadeChaves++;
 			reg_arvore[n_paginas-1].eFolha = 1;
-			printf("Chamando InsereChaveNoIndiceArvore\n");
+			//printf("Chamando InsereChaveNoIndiceArvore\n");
 			InsereChaveNoIndiceArvore(reg_arvore, subarvore, rd->idServidor, pos);
 			if(n_reg == 7){
 				n_paginas++;
@@ -79,11 +80,10 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 			//reg_arvore[n_reg-1].ponteiroDados = pos;
 		}
 	}
-
+*/
 	//escreve o cabeçalho do arquivo de indice de arvore B no arquivo
-	printf("chamando nova_arvoreB\n");
-	nova_arvoreB(bin_indice); 
 
+/*
 	//passando os registros de indice de arvoreB para o arquivo de arvoreB
 	//for (int i = 0; i < n_paginas; ++i)
 	//{
@@ -91,6 +91,16 @@ void cria_arvoreB(char* nomeBin_in, char* nomeBin_indice){
 	//}
 
 */
+
+	//atualizando status do arquivo de indice arvore B
+	rewind(bin_indice);
+	char status = '1';	// Status para indicar a consistência do arquivo.
+
+	fwrite(&status, sizeof(status), 1, bin_indice);
+
+	fclose(bin_in); fclose(bin_indice);
+
+
 }
 
 
@@ -218,6 +228,20 @@ long int BuscaArvoreB(FILE* bin_indice, REGISTRO_ARVORE *reg, int chave, int* ni
 	return BuscaArvoreB(bin_indice, LeRegistroArvore(bin_indice, filho), chave, nivel);
 }
 
+void nova_arvoreB(FILE* bin_indice) {
+	char status = '0';	// Status para indicar a consistência do arquivo.
+	int noRaiz = -1;	// RRN do nó raíz.
+
+	fwrite(&status, sizeof(status), 1, bin_indice);
+	fwrite(&noRaiz, sizeof(noRaiz), 1, bin_indice);
+
+	int restoPagina = TAMANHO_PAGINA - CABECALHO_ARVORE;
+	char arroba = '@';
+	for(int i = 0; i < restoPagina; i++){ //preenchendo com @ o resto da pagina
+		fwrite(&arroba, sizeof(char), 1, bin_indice);
+	}
+}
+
 
 /*void InsereReg_naArvore(FILE* bin_indice, REGISTRO_ARVORE* registro) {
 	if (registro == NULL) //verifica se o registro e o RRN são válidos
@@ -245,19 +269,7 @@ REGISTRO_ARVORE* CriaRegistroArvore() {
 	return registro;
 }
 
-void nova_arvoreB(FILE* bin_indice) {
-	char status = 0;	// Status para indicar a consistência do arquivo.
-	int noRaiz = -1;	// RRN do nó raíz.
 
-	fwrite(&status, sizeof(status), 1, bin_indice);
-	fwrite(&noRaiz, sizeof(noRaiz), 1, bin_indice);
-
-	int restoPagina = TAMANHO_PAGINA - CABECALHO_ARVORE;
-	char arroba = '@';
-	for(int i = 0; i < restoPagina; i++){ //preenchendo com @ o resto da pagina
-		fwrite(&arroba, sizeof(char), 1, bin_indice);
-	}
-}
 
 // Função responsável por inserir uma nova chave de busca em um nó da árvore B. Não trata dos casos
 // de overflow, e só deve ser chamada após conferir se o nó não está cheio.
