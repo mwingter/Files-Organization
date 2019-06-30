@@ -442,8 +442,6 @@ void cria_indice_arvoreB(){
 
 	cria_arvoreB(nomeBin_in, nomeBin_indice);
 
-
-
 	binarioNaTela2(nomeBin_indice);
 }
 
@@ -461,15 +459,15 @@ void recuperaDados_arvoreB(){
 	check_file_status(bin_in);
 	int nivel = 0;
 
-	long int ind = busca_e_recupera_arvoreB(nomeBin_indice, valor, &nivel);
+	long int pos = busca_e_recupera_arvoreB(nomeBin_indice, valor, &nivel);
 	
-	if (ind != -1)
+	if (pos != -1)
 	{
 		REGCAB *rc = calloc(1, sizeof(REGCAB));
 		rewind(bin_in);
 		leCabecalho(bin_in, rc);
 
-		fseek(bin_in, ind, SEEK_SET);
+		fseek(bin_in, pos, SEEK_SET);
 
 		int tam_pagina = 0;
 		REGDADOS *rd = calloc(1, sizeof(REGDADOS));
