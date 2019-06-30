@@ -34,7 +34,6 @@
 *.app
 *.i*86
 *.x86_64
-*.hex
 
 # Debug files
 *.dSYM/
@@ -52,7 +51,6 @@ Mkfile.old
 dkms.conf
 
 *.txt
-*.bin
 *.index
 *.in
 *.out
