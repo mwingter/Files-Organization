@@ -17,9 +17,6 @@
 #include "organizaArq.h"
 #include "indice.h"
 
-#define POSICAO_NO_RAIZ 1
-#define POSICAO_ALTURA POSICAO_NO_RAIZ + 4
-#define POSICAO_ULTIMO_RRN POSICAO_ALTURA + 4
 
 
 //============================= [15] CRIAR ARVORE B ===============================
